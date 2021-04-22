@@ -4,7 +4,7 @@ class Play extends Phaser.Scene {
     }
     
     init() {
-        this.runSpeed = 8; //determines how quickly the game moves
+        this.runSpeed = 8; //current speed of the player
         this.deltaTicker = 0.0; //mechanism for capping game at 60fps
     }
 
@@ -12,6 +12,8 @@ class Play extends Phaser.Scene {
         this.load.image("sun", "./assets/sun_background.png");
         this.load.image("buildings", "./assets/buildings_background.png");
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
+        this.load.spritesheet("fireguy", "./assets/fire_guy.png",
+            {frameWidth:25, frameHeight: 24, startFrame: 0, endFrame: 2});
     }
 
     create() {
@@ -38,6 +40,13 @@ class Play extends Phaser.Scene {
             640,
             480,
             "mushrooms").setOrigin(0,0);
+
+        //display little engine
+        this.engine = this.add.sprite(
+            borderUISize + this.runSpeed,
+            game.config.height - 2*borderUISize,
+            "fireguy",
+            0);
     }
 
     update(time, delta) {
