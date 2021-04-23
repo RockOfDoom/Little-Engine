@@ -13,14 +13,8 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("sun", "./assets/sun_background.png");
-        this.load.image("buildings", "./assets/buildings_background.png");
-        this.load.image("mushrooms", "./assets/mushrooms_background.png");
-        this.load.image("groundbacking", "./assets/groundbacking.png");
-        this.load.image("ground", "./assets/ground.png");
         this.load.image("groundbox", "./assets/groundbox.png");
-        this.load.spritesheet("fireguy", "./assets/fire_guy.png",
-            {frameWidth: 25, frameHeight: 24, startFrame: 0, endFrame: 2});
+        this.load.audio("jumpSFX", "./assets/Jump2.wav");
     }
 
     create() {
@@ -115,7 +109,7 @@ class Play extends Phaser.Scene {
             if(!this.gameOver) {
                 //check collisions
                 this.physics.world.collide(this.engine, this.groundBox, () => {
-                    if(this.engine.airborne) {
+                    if(this.engine.airborne) { //if player has just touched ground, land
                         this.engine.land();
                     }
                 });
