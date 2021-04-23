@@ -114,7 +114,11 @@ class Play extends Phaser.Scene {
             //update game pieces if game is not over
             if(!this.gameOver) {
                 //check collisions
-                this.physics.world.collide(this.engine, this.groundBox, this.engine.land);
+                this.physics.world.collide(this.engine, this.groundBox, () => {
+                    if(this.engine.airborne) {
+                        this.engine.land();
+                    }
+                });
 
                 //update engine
                 this.engine.update(this.runSpeed, this.gas, this.aniFrame);

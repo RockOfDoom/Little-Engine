@@ -18,7 +18,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     update(speed, gas, frame) {
         this.x = borderUISize + 5 * speed;
 
-        if(this.jKey.isDown && !this.airborne && !this.attacking) {
+        if(this.jKey.isDown && !this.airborne) {
             console.log("jump initiated");
             this.jump();
         }
