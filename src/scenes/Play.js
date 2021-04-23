@@ -18,11 +18,16 @@ class Play extends Phaser.Scene {
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
+        this.load.image("groundbox", "./assets/groundbox.png");
         this.load.spritesheet("fireguy", "./assets/fire_guy.png",
-            {frameWidth:25, frameHeight: 24, startFrame: 0, endFrame: 2});
+            {frameWidth: 25, frameHeight: 24, startFrame: 0, endFrame: 2});
     }
 
     create() {
+        //define input keys
+        keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
         //display sky
         this.sky = this.add.tileSprite(
             0,
@@ -63,6 +68,13 @@ class Play extends Phaser.Scene {
             480,
             "ground").setOrigin(0,0);
 
+        //place ground hitbox
+        this.groundBox = this.physics.add.image(
+            0,
+            game.config.height - 1.62 * borderUISize,
+            "groundbox").setOrigin(0,0);
+        this.groundBox.body.setImmovable();
+
         //prepare little engine animations
         //walk
         this.anims.create({
@@ -79,7 +91,11 @@ class Play extends Phaser.Scene {
             borderUISize + this.runSpeed,
             game.config.height - 2 * borderUISize,
             "fireguy",
-            0);
+            0,
+            keyF,
+            keySPACE);
+        //give engine gravity
+        this.engine.setGravityY(100);
         
         this.engine.anims.play("run");
     }
@@ -92,11 +108,17 @@ class Play extends Phaser.Scene {
             this.mushrooms.tilePositionX += this.runSpeed - (this.runSpeed / 8);
             this.groundbacking.tilePositionX += this.runSpeed;
             this.ground.tilePositionX += this.runSpeed;
-            console.log("speed: " + this.runSpeed);
-            console.log("gas: " + this.gas);
+            // console.log("speed: " + this.runSpeed);
+            // console.log("gas: " + this.gas);
 
             //update game pieces if game is not over
             if(!this.gameOver) {
+                //check collisions
+                this.physics.world.collide(this.engine, this.groundBox, this.engine.land);
+
+                //update engine
+                this.engine.update(this.runSpeed, this.gas, this.aniFrame);
+
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
                     this.gas = 100;
@@ -108,15 +130,18 @@ class Play extends Phaser.Scene {
                     //
                 }
                 else if(this.gas > 0) { //if engine is low, but not empty, decelerate
-                    this.runSpeed -= this.runSpeed * 0.0001;                
+                    this.runSpeed -= this.runSpeed * 0.0002;                
                 }
                 else {
                     if(this.runSpeed = 0) { //if player is out of gas and speed, end game
                         this.gameOver = true;
                     }
                     else { //if player is out of gas but not speed, skid to a halt
-                        this.runSpeed -= this.runSpeed * 0.001;
+                        this.runSpeed -= this.runSpeed * 0.0001;
                         if(this.runSpeed < 0.0000000001) {
+                            this.runSpeed = 0;
+                        }
+                        if(this.runSpeed < 0) {
                             this.runSpeed = 0;
                         }
                     }
