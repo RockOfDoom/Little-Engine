@@ -20,7 +20,26 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(speed, gas, frame) {
-        this.x = borderUISize + 5 * speed; //change position on screen based on speed
+        //change position on screen based on speed
+        if(speed == loSpeed && this.x != borderUISize) {
+            this.scene.tweens.add({
+                targets: [this],
+                x: {from: borderUISize, to: this.x},
+                duration: 3000,
+            });
+        } else if(speed == midSpeed && this.x != borderUISize * 2) {
+            this.scene.tweens.add({
+                targets: [this],
+                x: {from: borderUISize * 2, to: this.x},
+                duration: 3000,
+            });
+        } else if(speed == hiSpeed && this.x != borderUISize * 3) {
+            this.scene.tweens.add({
+                targets: [this],
+                x: {from: borderUISize * 3, to: this.x},
+                duration: 3000,
+            });
+        }
 
         if(this.attacking) { //attacking halts falling or jumping
             this.setVelocity(0,0);
@@ -57,7 +76,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             if(!this.hurting) {
                 this.damaging = true;
             }});
-        this.scene.time.delayedCall(375, () => {this.damaging = false;});
+        this.scene.time.delayedCall(500, () => {this.damaging = false;});
         this.scene.tweens.add({
             targets: [this],
             scale: {from: 1, to: 0.5},
@@ -71,7 +90,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                     duration: 125});
             }
         });
-        this.scene.time.delayedCall(375, () => {this.scene.tweens.add({
+        this.scene.time.delayedCall(500, () => {this.scene.tweens.add({
                 targets: [this],
                 scale: {from: 2, to: 1},
                 duration: 75});
