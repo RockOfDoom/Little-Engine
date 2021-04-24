@@ -6,6 +6,8 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         //load input keys
         this.aKey = attackKey;
         this.jKey = jumpKey;
+        //load sounds
+        this.jumpSFX = scene.sound.add("jumpSFX");
         //define variables that track the current action the engine is performing
         this.running = true;
         this.attacking = false;
@@ -28,6 +30,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.jumping = true;
         this.airborne = true;
         this.setVelocity(0, -100);
+        this.jumpSFX.play();
         console.log("jump executed");
     }
 
