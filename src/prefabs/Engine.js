@@ -3,7 +3,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture, frame);
         scene.add.existing(this); //add sprite to scene
         scene.physics.add.existing(this); //assign physics to sprite
-        this.scene = scene;
+        this.scene = scene; //save scene so animations can be played from here
         //load input keys
         this.aKey = attackKey;
         this.jKey = jumpKey;
@@ -12,6 +12,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         //define variables that track the current action the engine is performing
         this.running = true;
         this.attacking = false;
+        this.damaging = false;
         this.jumping = false;
         this.airborne = false;
         this.landing = false;
@@ -19,16 +20,25 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(speed, gas, frame) {
-        this.x = borderUISize + 5 * speed;
+        this.x = borderUISize + 5 * speed; //change position on screen based on speed
 
-        if(this.jKey.isDown && !this.airborne) {
+        if(this.attacking) { //attacking halts falling or jumping
+            this.setVelocity(0,0);
+        }
+
+        if(this.jKey.isDown && !this.airborne) { //jump when jump input is recieved
             console.log("jump initiated");
             this.jump();
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(this.aKey) && !this.hurting && !this.attacking) { //attack when attack input is recieved
+            this.attack();
         }
     }
 
     jump() {
         this.jumping = true;
+        this.scene.time.delayedCall(25, () => {this.jumping = false;});
         this.airborne = true;
         this.setVelocity(0, -200);
         this.jumpSFX.play();
@@ -41,10 +51,36 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         console.log(this.airborne);
     }
 
-    attack() {}
+    attack() {
+        this.attacking = true;
+        this.scene.time.delayedCall(250, () => {
+            if(!this.hurting) {
+                this.damaging = true;
+            }});
+        this.scene.time.delayedCall(375, () => {this.damaging = false;});
+        this.scene.tweens.add({
+            targets: [this],
+            scale: {from: 1, to: 0.5},
+            duration: 250
+        });
+        this.scene.time.delayedCall(250, () => {
+            if(!this.hurting) {
+                this.scene.tweens.add({
+                    targets: [this],
+                    scale: {from: 0.5, to: 2},
+                    duration: 125});
+            }
+        });
+        this.scene.time.delayedCall(375, () => {this.scene.tweens.add({
+                targets: [this],
+                scale: {from: 2, to: 1},
+                duration: 75});
+            this.attacking = false;
+        });
+    }
 
     getHurt() {
         this.hurting = true;
-        this.hurting = this.scene.time.delayedCall(500, () => {this.hurting = false;});
+        this.scene.time.delayedCall(500, () => {this.hurting = false;});
     }
 }

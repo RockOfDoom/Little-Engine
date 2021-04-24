@@ -9,7 +9,11 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         this.x -= speed;
 
         if(this.x < -this.width) {
-            this.x = game.config.width;
+            this.reset();
         }
+    }
+
+    reset() {
+        this.x = game.config.width + this.width;
     }
 }

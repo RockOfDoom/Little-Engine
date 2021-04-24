@@ -78,6 +78,7 @@ class Play extends Phaser.Scene {
             game.config.height - 1.62 * borderUISize,
             "enemy1",
             0).setOrigin(0.5,1);
+        this.enemy1.body.setImmovable();
         //prepare enemy animation
         this.anims.create({
             key: "enemy1Run",
@@ -121,8 +122,8 @@ class Play extends Phaser.Scene {
             this.mushrooms.tilePositionX += this.runSpeed - (this.runSpeed / 8);
             this.groundbacking.tilePositionX += this.runSpeed;
             this.ground.tilePositionX += this.runSpeed;
-            // console.log("speed: " + this.runSpeed);
-            // console.log("gas: " + this.gas);
+            console.log("speed: " + this.runSpeed);
+            console.log("gas: " + this.gas);
 
             //update game pieces if game is not over
             if(!this.gameOver) {
@@ -133,7 +134,11 @@ class Play extends Phaser.Scene {
                     }
                 });
                 this.physics.world.collide(this.engine, this.enemy1, () => {
-                    if(!this.engine.hurting) { //lower speed if player runs into enemy
+                    if(this.engine.damaging) {
+                        this.gas += 10;
+                        this.enemy1.reset();
+                    }
+                    else if(!this.engine.hurting) { //lower speed if player runs into enemy
                         this.engine.getHurt();
                         this.runSpeed--;
                         if(this.runSpeed < 1) {
