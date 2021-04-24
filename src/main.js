@@ -16,4 +16,5 @@ let game = new Phaser.Game(config);
 let borderUISize = game.config.height / 15;
 let borderPadding = borderUISize / 3;
 
-let keySPACE, keyF;
+let keySPACE, keyF; //configure input keys
+let loSpeed, midSpeed, hiSpeed; //configure speed levels

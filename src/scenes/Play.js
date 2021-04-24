@@ -4,12 +4,16 @@ class Play extends Phaser.Scene {
     }
     
     init() {
-        this.runSpeed = 8; //current speed of the player
+        loSpeed = 2;
+        midSpeed = 4;
+        hiSpeed = 8;
+        this.runSpeed = hiSpeed; //current speed of the player
         this.gas = 100; //how much gas the player has in the tank
         this.distance = 0; //how far the player has travelled
         this.gameOver = false; //if this is true, game ends. becomes true if gas & speed = 0
         this.deltaTicker = 0.0; //mechanism for capping game at 60fps
-        this.aniFrame = 0; //tracks the current frame of the current animation (except run)
+        this.frameTick = 0; //tracks how many times update() has run
+        this.gasGuzzle = 1; //controls how quickly gas is consumed
     }
 
     preload() {
@@ -102,7 +106,7 @@ class Play extends Phaser.Scene {
         //display little engine
         this.engine = new Engine(
             this,
-            borderUISize + this.runSpeed,
+            borderUISize,
             game.config.height - 1.62 * borderUISize,
             "fireguy",
             0,
@@ -122,30 +126,49 @@ class Play extends Phaser.Scene {
             this.mushrooms.tilePositionX += this.runSpeed - (this.runSpeed / 8);
             this.groundbacking.tilePositionX += this.runSpeed;
             this.ground.tilePositionX += this.runSpeed;
-            console.log("speed: " + this.runSpeed);
-            console.log("gas: " + this.gas);
+            // console.log("speed: " + this.runSpeed);
+            // console.log("gas: " + this.gas);
+
+            //make ground standable
+            this.physics.world.collide(this.engine, this.groundBox, () => {
+                if(this.engine.airborne) { //if player has just touched ground, land
+                    this.engine.land();
+                }
+            });
 
             //update game pieces if game is not over
             if(!this.gameOver) {
+                //increase speed every 30s
+                if(this.frameTick % 900 == 0) {
+                    hiSpeed += 0.5;
+                    midSpeed += 0.5;
+                    loSpeed += 0.5;
+                    this.gasGuzzle += 0.5;
+                }
+
                 //check collisions
-                this.physics.world.collide(this.engine, this.groundBox, () => {
-                    if(this.engine.airborne) { //if player has just touched ground, land
-                        this.engine.land();
-                    }
-                });
                 this.physics.world.collide(this.engine, this.enemy1, () => {
                     if(this.engine.damaging) {
-                        this.gas += 10;
+                        this.gas += 10 * this.gasGuzzle;
                         this.enemy1.reset();
                     }
                     else if(!this.engine.hurting) { //lower speed if player runs into enemy
                         this.engine.getHurt();
-                        this.runSpeed--;
-                        if(this.runSpeed < 1) {
-                            this.runSpeed = 1;
+                        console.log("ow!");
+                        hiSpeed -= 0.5;
+                        if(hiSpeed < 3) {
+                            hiSpeed = 3;
+                        }
+                        midSpeed -= 0.5;
+                        if(midSpeed < 2) {
+                            midSpeed = 2;
+                        }
+                        loSpeed -= 0.5;
+                        if(loSpeed < 1) {
+                            loSpeed = 1;
                         }
                     }
-                })
+                });
 
                 //update engine
                 this.engine.update(this.runSpeed, this.gas, this.aniFrame);
@@ -154,46 +177,46 @@ class Play extends Phaser.Scene {
 
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
+                    console.log("gas overflow");
                     this.gas = 100;
                 }
-                if(this.gas > 67) { //if engine has full tank, accelerate
-                    this.runSpeed *= 1.0001;
-                }
-                else if(this.gas > 33) { //if engine has half tank, maintain speed
-                    //
-                }
-                else if(this.gas > 0) { //if engine is low, but not empty, decelerate
-                    this.runSpeed -= this.runSpeed * 0.0002;                
-                }
-                else {
-                    if(this.runSpeed = 0) { //if player is out of gas and speed, end game
-                        this.gameOver = true;
-                    }
-                    else { //if player is out of gas but not speed, skid to a halt
-                        this.runSpeed -= this.runSpeed * 0.0001;
-                        if(this.runSpeed < 0.0000000001) {
-                            this.runSpeed = 0;
-                        }
-                        if(this.runSpeed < 0) {
-                            this.runSpeed = 0;
-                        }
-                    }
+
+                if(this.gas > 66 && this.runSpeed != hiSpeed) { //if engine has full tank, go to high speed
+                    console.log("hispeed set");
+                    this.runSpeed = hiSpeed;
+                } else if(this.gas >= 33 &&  this.gas <= 66 && this.runSpeed != midSpeed) { //if engine has half tank, go to medium speed
+                    console.log("midspeed set");
+                    this.runSpeed = midSpeed;
+                } else if(this.gas > 0 && this.gas < 33 && this.runSpeed != loSpeed) { //if engine is low, but not empty, go to low speed
+                    console.log("lowspeed set");
+                    this.runSpeed = loSpeed;          
+                } else if(this.gas <= 0) {
+                    //if player is out of gas, end game
+                    this.gameOver = true;
+                    console.log("game over");
                 }
 
 
-                //consume gas based on speed
+                //consume gas based how long game has been going
                 if(this.gas > 0) {
-                    this.gas -= this.runSpeed / 1000;
+                    this.gas -= 0.01666666 * this.gasGuzzle;
                     if(this.gas < 0) {
                         this.gas = 0;
                     }
                 }
             }
             else { //game over screen
-                //
+                if(this.runSpeed != 0) {
+                    console.log("decelerating");
+                    this.runSpeed -= loSpeed * 0.005;
+                    if(this.runSpeed < 0) {
+                        this.runSpeed = 0;
+                    }
+                }
             }
-            //tick deltaTicker down once
+            //tick deltaTicker down once and frameTick up once
             this.deltaTicker -= 16.666666;
+            this.frameTick++;
         }
     }
 }
