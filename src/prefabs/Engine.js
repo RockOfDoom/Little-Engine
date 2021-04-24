@@ -23,22 +23,22 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
 
     update(speed, gas, frame) {
         //change position on screen based on speed
-        if(speed == loSpeed && this.x != borderUISize) {
+        if(speed == loSpeed && this.x != borderUISize + this.width / 2) {
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize, to: this.x},
+                x: {from: borderUISize + this.width / 2, to: this.x},
                 duration: 3000,
             });
-        } else if(speed == midSpeed && this.x != borderUISize * 2) {
+        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2) {
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize * 2, to: this.x},
+                x: {from: borderUISize * 2 + this.width / 2, to: this.x},
                 duration: 3000,
             });
-        } else if(speed == hiSpeed && this.x != borderUISize * 3) {
+        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2) {
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize * 3, to: this.x},
+                x: {from: borderUISize * 3 + this.width / 2, to: this.x},
                 duration: 3000,
             });
         }
