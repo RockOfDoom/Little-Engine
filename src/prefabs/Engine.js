@@ -3,6 +3,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture, frame);
         scene.add.existing(this); //add sprite to scene
         scene.physics.add.existing(this); //assign physics to sprite
+        this.scene = scene;
         //load input keys
         this.aKey = attackKey;
         this.jKey = jumpKey;
@@ -29,7 +30,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     jump() {
         this.jumping = true;
         this.airborne = true;
-        this.setVelocity(0, -100);
+        this.setVelocity(0, -200);
         this.jumpSFX.play();
         console.log("jump executed");
     }
@@ -41,4 +42,9 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     }
 
     attack() {}
+
+    getHurt() {
+        this.hurting = true;
+        this.hurting = this.scene.time.delayedCall(500, () => {this.hurting = false;});
+    }
 }

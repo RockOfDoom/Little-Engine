@@ -108,7 +108,7 @@ class Play extends Phaser.Scene {
             keyF,
             keySPACE).setOrigin(0.5,1);
         //give engine gravity
-        this.engine.setGravityY(100);
+        this.engine.setGravityY(200);
         
         this.engine.anims.play("run");
     }
@@ -132,6 +132,15 @@ class Play extends Phaser.Scene {
                         this.engine.land();
                     }
                 });
+                this.physics.world.collide(this.engine, this.enemy1, () => {
+                    if(!this.engine.hurting) { //lower speed if player runs into enemy
+                        this.engine.getHurt();
+                        this.runSpeed--;
+                        if(this.runSpeed < 1) {
+                            this.runSpeed = 1;
+                        }
+                    }
+                })
 
                 //update engine
                 this.engine.update(this.runSpeed, this.gas, this.aniFrame);
