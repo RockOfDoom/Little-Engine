@@ -19,6 +19,8 @@ class Play extends Phaser.Scene {
     preload() {
         this.load.image("groundbox", "./assets/groundbox.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
+        this.load.audio("atkSFX", "./assets/Fireball.wav");
+        this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
         this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
             {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
     }

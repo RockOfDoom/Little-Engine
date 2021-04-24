@@ -9,6 +9,8 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.jKey = jumpKey;
         //load sounds
         this.jumpSFX = scene.sound.add("jumpSFX");
+        this.atkSFX = scene.sound.add("atkSFX");
+        this.hurtSFX = scene.sound.add("hurtSFX");
         //define variables that track the current action the engine is performing
         this.running = true;
         this.attacking = false;
@@ -72,11 +74,6 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
 
     attack() {
         this.attacking = true;
-        this.scene.time.delayedCall(250, () => {
-            if(!this.hurting) {
-                this.damaging = true;
-            }});
-        this.scene.time.delayedCall(500, () => {this.damaging = false;});
         this.scene.tweens.add({
             targets: [this],
             scale: {from: 1, to: 0.5},
@@ -84,22 +81,26 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         });
         this.scene.time.delayedCall(250, () => {
             if(!this.hurting) {
+                this.damaging = true;
+                this.atkSFX.play();
                 this.scene.tweens.add({
                     targets: [this],
                     scale: {from: 0.5, to: 2},
                     duration: 125});
-            }
-        });
-        this.scene.time.delayedCall(500, () => {this.scene.tweens.add({
+            }});
+        this.scene.time.delayedCall(500, () => {
+            this.scene.tweens.add({
                 targets: [this],
                 scale: {from: 2, to: 1},
                 duration: 75});
             this.attacking = false;
+            this.damaging = false;
         });
     }
 
     getHurt() {
         this.hurting = true;
+        this.hurtSFX.play();
         this.scene.time.delayedCall(500, () => {this.hurting = false;});
     }
 }
