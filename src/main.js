@@ -8,7 +8,7 @@ let config = {
             debug: true
         }
     },
-    scene: [Menu, Play],
+    scene: [Menu, Play, Tutorial],
 };
 
 let game = new Phaser.Game(config);
@@ -17,3 +17,8 @@ let borderUISize = game.config.height / 15;
 let borderPadding = borderUISize / 3;
 
 let keySPACE, keyF;
+
+let buildingsX = 0;
+let mushroomsX = 0;
+let groundbackingX = 0;
+let groundX = 0;
