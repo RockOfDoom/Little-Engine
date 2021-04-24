@@ -100,7 +100,7 @@ class Play extends Phaser.Scene {
         this.anims.create({
             key: "run",
             frames: this.anims.generateFrameNumbers("fireguy",
-                {start: 0, end: 2, first: 0}),
+                {start: 0, end: 3, first: 0}),
             frameRate: 9,
             repeat: -1
         });
@@ -115,7 +115,7 @@ class Play extends Phaser.Scene {
             keyF,
             keySPACE).setOrigin(0.5,1);
         //give engine gravity
-        this.engine.setGravityY(200);
+        this.engine.setGravityY(225);
         
         this.engine.anims.play("run");
     }

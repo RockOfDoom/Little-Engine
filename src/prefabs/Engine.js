@@ -61,7 +61,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.jumping = true;
         this.scene.time.delayedCall(25, () => {this.jumping = false;});
         this.airborne = true;
-        this.setVelocity(0, -200);
+        this.setVelocity(0, -225);
         this.jumpSFX.play();
         console.log("jump executed");
     }
@@ -85,13 +85,13 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                 this.atkSFX.play();
                 this.scene.tweens.add({
                     targets: [this],
-                    scale: {from: 0.5, to: 2},
+                    scale: {from: 0.5, to: 1.5},
                     duration: 125});
             }});
         this.scene.time.delayedCall(500, () => {
             this.scene.tweens.add({
                 targets: [this],
-                scale: {from: 2, to: 1},
+                scale: {from: 1.5, to: 1},
                 duration: 75});
             this.attacking = false;
             this.damaging = false;

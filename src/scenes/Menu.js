@@ -16,8 +16,8 @@ class Menu extends Phaser.Scene {
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
-        this.load.spritesheet("fireguy", "./assets/fire_guy.png",
-            {frameWidth:25, frameHeight: 24, startFrame: 0, endFrame: 2});
+        this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
+            {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
     }
 
     create() {
@@ -25,7 +25,7 @@ class Menu extends Phaser.Scene {
         this.anims.create({
             key: "run",
             frames: this.anims.generateFrameNumbers("fireguy",
-                {start: 0, end: 2, first: 0}),
+                {start: 0, end: 3, first: 0}),
             frameRate: 9,
             repeat: -1
         });
