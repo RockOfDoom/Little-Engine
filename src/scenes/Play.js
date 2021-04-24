@@ -15,6 +15,8 @@ class Play extends Phaser.Scene {
     preload() {
         this.load.image("groundbox", "./assets/groundbox.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
+        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
+            {frameWidth: 256, frameHeight: 256, startFrame: 0, endFrame: 8});
     }
 
     create() {
@@ -69,6 +71,23 @@ class Play extends Phaser.Scene {
             "groundbox").setOrigin(0,0);
         this.groundBox.body.setImmovable();
 
+        //create enemy
+        this.enemy1 = new Enemy1(
+            this,
+            game.config.width,
+            game.config.height - 1.62 * borderUISize,
+            "enemy1",
+            0).setOrigin(0.5,1);
+        //prepare enemy animation
+        this.anims.create({
+            key: "enemy1Run",
+            frames: this.anims.generateFrameNumbers("enemy1",
+                {start: 0, end: 8, first: 0}),
+            frameRate: 24,
+            repeat: -1
+        });
+        this.enemy1.anims.play("enemy1Run");
+
         //prepare little engine animations
         //walk
         this.anims.create({
@@ -83,11 +102,11 @@ class Play extends Phaser.Scene {
         this.engine = new Engine(
             this,
             borderUISize + this.runSpeed,
-            game.config.height - 2 * borderUISize,
+            game.config.height - 1.62 * borderUISize,
             "fireguy",
             0,
             keyF,
-            keySPACE);
+            keySPACE).setOrigin(0.5,1);
         //give engine gravity
         this.engine.setGravityY(100);
         
@@ -116,6 +135,8 @@ class Play extends Phaser.Scene {
 
                 //update engine
                 this.engine.update(this.runSpeed, this.gas, this.aniFrame);
+                //update enemies
+                this.enemy1.update(this.runSpeed);
 
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
