@@ -5,12 +5,12 @@ class Menu extends Phaser.Scene {
 
     init() {
         this.bgOffset = 50;         // this makes the bg elements lower on the title screen than on the play screen
-        this.tweenLength = 4000;    // so all the tweens later on are the same length
-        this.parallaxMovement = 2;  // used for parallax on the title screen only
+        this.parallaxMovement = 2;  // used for parallax on the title and tutorial scenes
     }
 
     preload() {
         this.load.image("menu ui", "./assets/menu_ui_image.png");
+        this.load.image("tutorial ui", "./assets/tutorial_ui_image.png");
         this.load.image("sun", "./assets/sun_background.png");
         this.load.image("buildings", "./assets/buildings_background.png");
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
@@ -55,6 +55,9 @@ class Menu extends Phaser.Scene {
             480,
             "buildings"
             ).setOrigin(0, 0);
+
+        this.buildings.tilePositionX = buildingsX + this.parallaxMovement;
+
         this.mushrooms = this.add.tileSprite(
             0, 
             this.bgOffset*5, 
@@ -83,70 +86,79 @@ class Menu extends Phaser.Scene {
             "menu ui"
             ).setOrigin(0, 0);
         
+        this.tweens.add({
+            targets: [this.menuSprite],
+            alpha: {from: 0, to: 1},
+            duration: 500,
+        });
+        
         // our baby!
         this.engine = this.add.sprite(
-            borderUISize,
+            borderUISize + 8,
             game.config.height - 2 * borderUISize,
             "fireguy",
             0);
 
-        // okay here are all the tweens. they are essentially identical, but for each of the different
-        // layers of the background.
+        // okay here are all the tweens. 
+        this.tweenLength = 4000;
+        this.tweenEase = "Back.In";
+        this.isTweening = false;
         // in the future, i will change this so that the different keys go to different screens/tweens
         // i am using Quart.easeOut but maybe i will change that to
-        this.input.keyboard.on("keydown", () => {
-            this.tweens.add({
-                targets: [this.sun],
-                y: {from: this.sun.y, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            }).on("complete", () =>
-                this.scene.start("playScene"), this);
-            this.tweens.add({
-                targets: [this.buildings],
-                y: {from: this.buildings.y, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            });
-            this.tweens.add({
-                targets: [this.mushrooms],
-                y: {from: this.mushrooms.y, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            });
-            this.tweens.add({
-                targets: [this.ground],
-                y: {from: this.ground.y, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            });
-            this.tweens.add({
-                targets: [this.groundbacking],
-                y: {from: this.groundbacking.y, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            });
+        this.input.keyboard.on("keydown-SPACE", () => {
+            if (this.isTweening == false) {
+                this.isTweening = true;
+                this.tweens.add({
+                    targets: [this.sun, this.buildings, this.mushrooms, this.groundbacking, this.ground],
+                    y: 0,
+                    duration: this.tweenLength,
+                    ease: this.tweenEase
+                }).on("complete", () => {
+                    buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
+                    mushroomsX = this.buildings.tilePositionX;
+                    groundbackingX =this.buildings.tilePositionX;
+                    groundX = this.buildings.tilePositionX;
+                    this.scene.start("playScene"), this
+                });
+                
+                // this one tweens the parallax movement to zero so that the play screen starts stationary
+                this.tweens.add({
+                    targets: this,
+                    parallaxMovement: {from: this.parallaxMovement, to: 0},
+                    duration: this.tweenLength,
+                    ease: this.tweenEase
+                });
 
-            // this one tweens the parallax movement to zero so that the play screen starts stationary
-            this.tweens.add({
-                targets: this,
-                parallaxMovement: {from: this.parallaxMovement, to: 0},
-                duration: this.tweenLength,
-                ease: "Quart.easeOut"
-            });
+                // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
+                this.tweens.add({
+                    targets: [this.menuSprite],
+                    alpha: {from: 1, to: 0},
+                    duration: this.tweenLength/2,
+                });
+            }
+        });
 
-            // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
-            this.tweens.add({
-                targets: [this.menuSprite],
-                alpha: {from: 1, to: 0},
-                duration: this.tweenLength/2,
-                ease: "Quart.easeOut"
-            });
-            //this.scene.start("playScene");
+        this.input.keyboard.on("keydown-F", () => {
+            if (this.isTweening == false) {
+                this.isTweening = true;
+                this.tweens.add({
+                    targets: [this.menuSprite],
+                    alpha: {from: 1, to: 0},
+                    duration: 500,
+                }).on("complete", () => {
+                    buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
+                    this.scene.start("tutorialScene"), this
+                });
+            }
         });
     }
 
     update() {
+        this.sun.y = Math.round(this.sun.y);
+        this.buildings.y = Math.round(this.buildings.y);
+        this.mushrooms.y = Math.round(this.mushrooms.y);
+        this.groundbacking.y = Math.round(this.groundbacking.y);
+        this.ground.y = Math.round(this.ground.y);
         this.buildings.tilePositionX += this.parallaxMovement;
         this.mushrooms.tilePositionX += this.parallaxMovement*1.5;
         this.groundbacking.tilePositionX += this.parallaxMovement*2;
