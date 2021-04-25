@@ -14,6 +14,6 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
     }
 
     reset() {
-        this.x = game.config.width + this.width;
+        this.x = game.config.width + this.width + 20 * this.width;
     }
 }
