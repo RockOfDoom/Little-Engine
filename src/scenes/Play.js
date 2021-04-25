@@ -18,6 +18,8 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.image("groundbox", "./assets/groundbox.png");
+        this.load.image("gameover ui", "./assets/gameover_ui_image.png");
+        this.load.image("meter", "./assets/meter.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -118,6 +120,55 @@ class Play extends Phaser.Scene {
         this.engine.setGravityY(225);
         
         this.engine.anims.play("run");
+        
+        // draw the game over UI with alpha at zero
+        this.gameoverUI = this.add.sprite(
+            0,
+            0,
+            "gameover ui"
+            ).setOrigin(0, 0);
+        this.gameoverUI.alpha = 0;
+        this.gameoverUITween = false;
+        
+        // draw fuel gauge sprite
+        // in the future this will have two sprites + numbers
+        this.fuelGauge = this.add.sprite(
+            borderUISize /2,
+            borderUISize/2,
+            "meter"
+            ).setOrigin(0, 0);
+        
+        // draw speedometer sprite
+        // same thing as above
+        this.speedometer = this.add.sprite(
+            config.width - borderUISize/2,
+             borderUISize/2,
+            "meter"
+            ).setOrigin(1, 0);
+        this.speedometer.flipX = true;
+
+        // text for the meters... this will probaby be replaced later
+        let numbersConfig = {
+            fontFamily: "Verdana",
+            fontSize: "24px",
+            color: "#000",
+            backgroundColor: "#fff",
+            align: "center",
+            padding: 5,
+        }
+        this.fuelGaugeText = this.add.text(
+            this.fuelGauge.x + borderUISize/2,
+            this.fuelGauge.y + borderUISize/2,
+            Math.round(this.gas),
+            numbersConfig
+        );
+        numbersConfig.align = "left";
+        this.speedometerText = this.add.text(
+            this.speedometer.x - borderUISize*1.5,
+            this.speedometer.y + borderUISize/2,
+            Math.round(this.runSpeed*10),
+            numbersConfig
+        );
     }
 
     update(time, delta) {
@@ -208,17 +259,35 @@ class Play extends Phaser.Scene {
                 }
             }
             else { //game over screen
+                if (this.gameoverUITween == false && this.runSpeed == 0) {
+                    this.gameoverUITween = true;
+                    this.tweens.add({
+                        targets: [this.gameoverUI],
+                        alpha: {from: 0, to: 1},
+                        duration: 1000
+                    });
+                }
                 if(this.runSpeed != 0) {
                     console.log("decelerating");
                     this.runSpeed -= loSpeed * 0.005;
                     if(this.runSpeed < 0) {
                         this.runSpeed = 0;
                     }
+                } else {
+                    if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
+                        this.scene.start("playScene");
+                    } else if (Phaser.Input.Keyboard.JustDown(keyF)) {
+                        this.scene.start("menuScene");
+                    }
                 }
             }
             //tick deltaTicker down once and frameTick up once
             this.deltaTicker -= 16.666666;
             this.frameTick++;
+
+            // updating the text on the fuel gauge and speedometer
+            this.fuelGaugeText.text = Math.round(this.gas);
+            this.speedometerText.text = Math.round(this.runSpeed*10);
         }
     }
 }
