@@ -19,25 +19,25 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.airborne = false;
         this.landing = false;
         this.hurting = false;
-        this.tweening = false;
+        this.tweening = 0;
     }
 
     update(speed, gas, frame) {
         //change position on screen based on speed
-        if(speed == loSpeed && this.x != borderUISize + this.width / 2 && !this.tweening) {
-            this.tweening = true;
+        if(speed == loSpeed && this.x != borderUISize + this.width / 2 && this.tweening != 1) {
+            this.tweening = 1;
             this.scene.time.delayedCall(3000, () => {
-                this.tweening = false;
+                this.tweening = 0;
             });
             this.scene.tweens.add({
                 targets: [this],
                 x: {from: this.x, to: borderUISize + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2 && !this.tweening) {
-            this.tweening = true;
+        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2 && this.tweening != 2) {
+            this.tweening = 2;
             this.scene.time.delayedCall(3000, () => {
-                this.tweening = false;
+                this.tweening = 0;
             });
             this.sc
             this.scene.tweens.add({
@@ -45,10 +45,10 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                 x: {from: this.x, to: borderUISize * 2 + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2 && !this.tweening) {
-            this.tweening = true;
+        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2 && this.tweening != 3) {
+            this.tweening = 3;
             this.scene.time.delayedCall(3000, () => {
-                this.tweening = false;
+                this.tweening = 0;
             });
             this.sc
             this.scene.tweens.add({
