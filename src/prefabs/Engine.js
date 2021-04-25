@@ -19,26 +19,41 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.airborne = false;
         this.landing = false;
         this.hurting = false;
+        this.tweening = false;
     }
 
     update(speed, gas, frame) {
         //change position on screen based on speed
-        if(speed == loSpeed && this.x != borderUISize + this.width / 2) {
+        if(speed == loSpeed && this.x != borderUISize + this.width / 2 && !this.tweening) {
+            this.tweening = true;
+            this.scene.time.delayedCall(3000, () => {
+                this.tweening = false;
+            });
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize + this.width / 2, to: this.x},
+                x: {from: this.x, to: borderUISize + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2) {
+        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2 && !this.tweening) {
+            this.tweening = true;
+            this.scene.time.delayedCall(3000, () => {
+                this.tweening = false;
+            });
+            this.sc
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize * 2 + this.width / 2, to: this.x},
+                x: {from: this.x, to: borderUISize * 2 + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2) {
+        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2 && !this.tweening) {
+            this.tweening = true;
+            this.scene.time.delayedCall(3000, () => {
+                this.tweening = false;
+            });
+            this.sc
             this.scene.tweens.add({
                 targets: [this],
-                x: {from: borderUISize * 3 + this.width / 2, to: this.x},
+                x: {from: this.x, to: borderUISize * 3 + this.width / 2},
                 duration: 3000,
             });
         }
