@@ -202,7 +202,7 @@ class Play extends Phaser.Scene {
                 //check collisions
                 this.physics.world.collide(this.engine, this.enemy1, () => {
                     if(this.engine.damaging) {
-                        this.gas += 10 * this.gasGuzzle;
+                        this.gas += 10; //* this.gasGuzzle;
                         this.enemy1.reset();
                     }
                     else if(!this.engine.hurting) { //lower speed if player runs into enemy
