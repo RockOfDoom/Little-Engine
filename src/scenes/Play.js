@@ -7,8 +7,8 @@ class Play extends Phaser.Scene {
         loSpeed = 2;
         midSpeed = 4;
         hiSpeed = 8;
-        this.runSpeed = hiSpeed; //current speed of the player
-        this.gas = 100; //how much gas the player has in the tank
+        this.runSpeed = midSpeed; //current speed of the player
+        this.gas = 50; //how much gas the player has in the tank
         this.distance = 0; //how far the player has travelled
         this.gameOver = false; //if this is true, game ends. becomes true if gas & speed = 0
         this.deltaTicker = 0.0; //mechanism for capping game at 60fps
