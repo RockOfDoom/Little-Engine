@@ -39,6 +39,13 @@ class Platform extends Phaser.Physics.Arcade.Sprite {
             this.enemyTop = true;
         }
 
+        if(!this.enemyTop && Math.random() >= 0.5) { //if there isn't already an enemy on top, 50/50 shot of spawning enemy below
+            this.scene.spawnEnemy1(this.x + this.width / 4, game.config.height - 1.62 * borderUISize);
+        }
+        else if(Math.random() >= 0.75) { //if no enemy spawned below, ~75% of spawning obstacle
+            //spawn obstacle
+        }
+
         this.hasSpawned = true;
     } 
 }
