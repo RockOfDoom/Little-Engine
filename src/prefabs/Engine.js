@@ -117,9 +117,9 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.scene.tweens.add({
             targets: [this],
             scale: {from: 1, to: 0.5},
-            duration: 250
+            duration: 125
         });
-        this.scene.time.delayedCall(250, () => {
+        this.scene.time.delayedCall(125, () => {
             if(!this.hurting) {
                 this.damaging = true;
                 this.atkSFX.play();
