@@ -16,6 +16,7 @@ class Play extends Phaser.Scene {
         this.frameTick = 0; //tracks how many times update() has run
         this.gasGuzzle = 1; //controls how quickly gas is consumed
         this.platformFreq = 300; //controls the interval between platform spawns in ticks (60 per second)
+        this.enemy1Freq = 600;
         this.intensity = 0; //controls the rate at which obstacles spawn, goes up over time
     }
 
@@ -98,14 +99,10 @@ class Play extends Phaser.Scene {
             "groundbox").setOrigin(0,0);
         this.groundBox.body.setImmovable();
 
-        //create enemy
-        this.enemy1 = new Enemy1(
-            this,
-            game.config.width,
-            game.config.height - 1.62 * borderUISize,
-            "enemy1",
-            0).setOrigin(0.5,1);
-        this.enemy1.body.setImmovable();
+        //create enemy1 group
+        this.enemy1Group = this.add.group({
+            runChildUpdate: true
+        });
         //prepare enemy animation
         this.anims.create({
             key: "enemy1Run",
@@ -114,7 +111,6 @@ class Play extends Phaser.Scene {
             frameRate: 24,
             repeat: -1
         });
-        this.enemy1.anims.play("enemy1Run");
 
         //display little engine
         this.engine = new Engine(
@@ -226,8 +222,6 @@ class Play extends Phaser.Scene {
                     this.engine.land();
                 }
             });
-            //update enemies
-            this.enemy1.update();
 
             //update distance by 1 * speed per second
             distance += speed / 60;
@@ -244,17 +238,17 @@ class Play extends Phaser.Scene {
                 }
 
                 //check collisions
-                this.physics.world.collide(this.engine, this.enemy1, () => {
+                this.physics.world.collide(this.engine, this.enemy1Group, (engine, enemy1) => {
                     if(this.engine.damaging) {
                         this.gas += 10; //* this.gasGuzzle;
-                        this.enemy1.reset();
+                        enemy1.die();
                     }
                     else if(!this.engine.hurting) { //lower speed if player runs into enemy
                         this.engine.getHurt();
                         console.log("ow!");
                         hiSpeed -= 0.5;
-                        if(hiSpeed < 3) {
-                            hiSpeed = 3;
+                        if(hiSpeed < 4) {
+                            hiSpeed = 4;
                         }
                         midSpeed -= 0.5;
                         if(midSpeed < 2) {
@@ -305,8 +299,21 @@ class Play extends Phaser.Scene {
                     }
                 }
 
-                //spawn platforms some frequency based on distance travelled
-                if(this.frameTick % this.platformFreq == 0) {
+                //spawn enemies some frequency based on ticks and speed
+                if(speed == hiSpeed && this.frameTick % (this.enemy1Freq / 2) == 0) {
+                    this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
+                } else if(speed == midSpeed && this.frameTick % this.enemy1Freq == 0) {
+                    this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
+                } else if(speed == loSpeed && this.frameTick % (this.enemy1Freq * 2) == 0) {
+                    this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
+                }
+
+                //spawn platforms some frequency based on ticks and speed
+                if(speed == hiSpeed && this.frameTick % (this.platformFreq / 2) == 0) {
+                    this.spawnPlatform();
+                } else if(speed == midSpeed && this.frameTick % this.platformFreq == 0) {
+                    this.spawnPlatform();
+                } else if(speed == loSpeed && this.frameTick % (this.platformFreq * 2) == 0) {
                     this.spawnPlatform();
                 }
             }
@@ -359,14 +366,20 @@ class Play extends Phaser.Scene {
 
     spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it and/or under it
         console.log("platform spawn go!");
-        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "platform", 0).setOrigin(0.5,0));
+        this.platformGroup.add(new Platform(
+            this, 
+            2 * game.config.width, 
+            game.config.height / 2 + borderUISize, 
+            "platform", 
+            0).setOrigin(0.5,0));
+    }
 
-        //spawn things on top of platform
-        if(Math.random() >= 0.5) { //50/50 shot of fuel spawn
-            this.fuelGroup.add(new Fuel(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "fuel", 0).setOrigin(0.5,0));
-        }
-        else if(Math.random() >= 0.5) { //if no fuel, 50/50 shot of enemy spawn
-            //spawn enemy
-        }
+    spawnEnemy1(x, y) {
+        this.enemy1Group.add(new Enemy1(
+            this,
+            x,
+            y,
+            "enemy1",
+            0).setOrigin(0.5,1));
     }
 }

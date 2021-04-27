@@ -6,6 +6,8 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         //configure hitbox
         this.body.setSize(40, 50, true);
         this.body.setOffset(1, 14);
+        this.body.setImmovable() //prevent from faling
+        this.anims.play("enemy1Run"); //play running animation
         this.scene = scene; //save scene for tween purposes
         this.goingRight = false; //keeps track of which way enemy is walking
         this.ticker = 0; //internal timer
@@ -18,12 +20,8 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         this.x -= this.totalSpeed;
 
         if(this.x < -this.width) {
-            this.reset();
+            this.die();
         }
-    }
-
-    reset() {
-        this.x = game.config.width + this.width + 10 * this.width;
     }
 
     wander() { //create illusion of walking left and right
