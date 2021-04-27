@@ -85,19 +85,38 @@ class Menu extends Phaser.Scene {
             0, 
             "menu ui"
             ).setOrigin(0, 0);
-        
-        this.tweens.add({
-            targets: [this.menuSprite],
-            alpha: {from: 0, to: 1},
-            duration: 500,
+        if (lastScene == "menu" || lastScene == "tutorial") {
+            this.tweens.add({
+                targets: [this.menuSprite],
+                alpha: {from: 0, to: 1},
+                duration: 500,
+            });
+        } else if (lastScene == "play") {
+            this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
+            this.transRect.setDepth(101);
+            this.tweens.add({
+                targets: [this.transRect],
+                alpha: {from: 1, to: 0},
+                duration: 2000
+            });
+        }
+
+        this.anims.create({
+            key: "run",
+            frames: this.anims.generateFrameNumbers("fireguy",
+                {start: 0, end: 3, first: 0}),
+            frameRate: 9,
+            repeat: -1
         });
         
         // our baby!
         this.engine = this.add.sprite(
-            borderUISize + 8,
-            game.config.height - 2 * borderUISize,
+            borderUISize,
+            config.height - 1.62 * borderUISize + this.bgOffset*10,
             "fireguy",
-            0);
+            0
+            ).setOrigin(.5, 1);
+        //this.engine.play("run");
 
         // okay here are all the tweens. 
         this.tweenLength = 4000;
@@ -115,10 +134,19 @@ class Menu extends Phaser.Scene {
                     ease: this.tweenEase
                 }).on("complete", () => {
                     buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
-                    mushroomsX = this.buildings.tilePositionX;
-                    groundbackingX =this.buildings.tilePositionX;
-                    groundX = this.buildings.tilePositionX;
+                    mushroomsX = this.mushrooms.tilePositionX + this.parallaxMovement;
+                    groundbackingX =this.groundbacking.tilePositionX + this.parallaxMovement;
+                    groundX = this.ground.tilePositionX + this.parallaxMovement;
+                    lastScene = "menu";
                     this.scene.start("playScene"), this
+                });
+
+                //this one is for engine to make it go to the right spot for the transition
+                this.tweens.add({
+                    targets: this.engine,
+                    y: game.config.height - 1.62 * borderUISize,
+                    duration: this.tweenLength,
+                    ease: this.tweenEase
                 });
                 
                 // this one tweens the parallax movement to zero so that the play screen starts stationary
@@ -126,7 +154,7 @@ class Menu extends Phaser.Scene {
                     targets: this,
                     parallaxMovement: {from: this.parallaxMovement, to: 0},
                     duration: this.tweenLength,
-                    ease: this.tweenEase
+                    //ease: this.tweenEase
                 });
 
                 // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
@@ -147,6 +175,7 @@ class Menu extends Phaser.Scene {
                     duration: 500,
                 }).on("complete", () => {
                     buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
+                    lastScene = "menu";
                     this.scene.start("tutorialScene"), this
                 });
             }
@@ -162,7 +191,7 @@ class Menu extends Phaser.Scene {
         this.buildings.tilePositionX += this.parallaxMovement;
         this.mushrooms.tilePositionX += this.parallaxMovement*1.5;
         this.groundbacking.tilePositionX += this.parallaxMovement*2;
-        this.engine.y = this.ground.y + this.ground.height - 59 - this.engine.height/2;
+        //this.engine.y = Math.round(this.ground.y + config.height - 79);
 
     }
 }

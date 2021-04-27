@@ -60,7 +60,8 @@ class Tutorial extends Phaser.Scene {
                     duration: 500,
                 }).on("complete", () => {
                     buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
-                    this.scene.start("menuScene"), this
+                    lastScene = "tutorial";
+                    this.scene.start("menuScene");
                 });
             }
         });

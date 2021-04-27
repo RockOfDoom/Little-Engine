@@ -19,22 +19,6 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("groundbox", "./assets/groundbox.png");
-        this.load.image("gameover ui", "./assets/gameover_ui_image.png");
-        this.load.image("meter", "./assets/meter.png");
-        this.load.image("platform", "./assets/platform.png");
-        this.load.audio("jumpSFX", "./assets/Jump2.wav");
-        this.load.audio("atkSFX", "./assets/Fireball.wav");
-        this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
-        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
-            {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
-    }
-
-    create() {
-        //define input keys
-        keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
-        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
         //display sky
         this.sky = this.add.tileSprite(
             0,
@@ -50,6 +34,7 @@ class Play extends Phaser.Scene {
             640,
             480,
             "buildings").setOrigin(0,0);
+        this.buildings.tilePositionX = buildingsX;
         
         //display mushrooms
         this.mushrooms = this.add.tileSprite(
@@ -58,6 +43,7 @@ class Play extends Phaser.Scene {
             640,
             480,
             "mushrooms").setOrigin(0,0);
+        this.mushrooms.tilePositionX = mushroomsX;
         
         //display groundbacking
         this.groundbacking = this.add.tileSprite(
@@ -66,7 +52,8 @@ class Play extends Phaser.Scene {
             640,
             480,
             "groundbacking").setOrigin(0,0);
-        
+        this.groundbacking.tilePositionX = groundbackingX;
+
         //display ground
         this.ground = this.add.tileSprite(
             0,
@@ -74,6 +61,33 @@ class Play extends Phaser.Scene {
             640,
             480,
             "ground").setOrigin(0,0);
+        this.ground.tilePositionX = groundX;
+
+        this.engine = this.add.sprite(
+            borderUISize,
+            game.config.height - 1.62 * borderUISize,
+            "fireguy",
+            0).setOrigin(0.5,1);
+        this.engine.play("run");
+        
+        
+
+        this.load.image("groundbox", "./assets/groundbox.png");
+        this.load.image("gameover ui", "./assets/gameover_ui_image.png");
+        this.load.image("meter", "./assets/meter.png");
+        this.load.image("platform", "./assets/platform.png");
+        this.load.audio("jumpSFX", "./assets/Jump2.wav");
+        this.load.audio("atkSFX", "./assets/Fireball.wav");
+        this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
+        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
+            {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
+    }
+
+    create() {
+        this.engine.destroy();
+        //define input keys
+        keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         //place ground hitbox
         this.groundBox = this.physics.add.image(
@@ -100,16 +114,6 @@ class Play extends Phaser.Scene {
         });
         this.enemy1.anims.play("enemy1Run");
 
-        //prepare little engine animations
-        //walk
-        this.anims.create({
-            key: "run",
-            frames: this.anims.generateFrameNumbers("fireguy",
-                {start: 0, end: 3, first: 0}),
-            frameRate: 9,
-            repeat: -1
-        });
-
         //display little engine
         this.engine = new Engine(
             this,
@@ -135,6 +139,10 @@ class Play extends Phaser.Scene {
             ).setOrigin(0, 0);
         this.gameoverUI.alpha = 0;
         this.gameoverUITween = false;
+        this.gameoverUI.setDepth(100);
+        
+        // this variable is used when u transition from game over to title screen
+        this.transRectTween = false;
         
         // draw fuel gauge sprite
         // in the future this will have two sprites + numbers
@@ -272,6 +280,7 @@ class Play extends Phaser.Scene {
                 if(this.frameTick % this.platformFreq == 0) {
                     this.spawnPlatform();
                 }
+                this.gas = 0;
             }
             else { //game over screen
                 if (this.gameoverUITween == false && speed == 0) {
@@ -291,8 +300,21 @@ class Play extends Phaser.Scene {
                 } else {
                     if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
                         this.scene.start("playScene");
-                    } else if (Phaser.Input.Keyboard.JustDown(keyF)) {
-                        this.scene.start("menuScene");
+                    } else if (Phaser.Input.Keyboard.JustDown(keyF) && this.transRectTween == false) {
+                        this.transRectTween = true;
+                        this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
+                        this.transRect.setDepth(101);
+                        this.transRect.alpha = 0;
+                        console.log("here");
+                        this.tweens.add({
+                            targets: [this.transRect],
+                            alpha: {from: 0, to: 1},
+                            duration: 1000
+                        }).on("complete", () => {
+                            lastScene = "play";
+                            this.scene.start("menuScene");
+                        });
+                        
                     }
                 }
             }

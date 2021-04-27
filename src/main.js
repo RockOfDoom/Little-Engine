@@ -24,3 +24,5 @@ let buildingsX = 0;
 let mushroomsX = 0;
 let groundbackingX = 0;
 let groundX = 0;
+
+let lastScene = "menu"; // this variable is so we can animate the scene transitions different depending on what the last scene was
