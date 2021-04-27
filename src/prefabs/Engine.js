@@ -11,6 +11,12 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.jumpSFX = scene.sound.add("jumpSFX");
         this.atkSFX = scene.sound.add("atkSFX");
         this.hurtSFX = scene.sound.add("hurtSFX");
+        //configure hitbox
+        this.body.setSize(40, 56, true);
+        this.body.setOffset(1, 2.25);
+        //give engine gravity
+        this.jumpHeight = 225;
+        this.setGravityY(this.jumpHeight);
         //define variables that track the current action the engine is performing
         this.running = true;
         this.attacking = false;
@@ -62,8 +68,12 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.setVelocity(0,0);
         }
 
-        if(this.jKey.isDown && !this.airborne) { //jump when jump input is recieved
-            console.log("jump initiated");
+        if(this.airborne && this.body.speed == 0) {
+            this.setGravityY(this.jumpHeight * 2);
+        }
+
+        if(this.jKey.isDown) { //jump when jump input is recieved
+            // console.log("jump initiated");
             this.jump();
         }
 
@@ -73,18 +83,24 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     }
 
     jump() {
-        this.jumping = true;
-        this.scene.time.delayedCall(25, () => {this.jumping = false;});
-        this.airborne = true;
-        this.setVelocity(0, -225);
-        this.jumpSFX.play();
-        console.log("jump executed");
+        if(!this.airborne) {
+            this.jumping = true;
+            this.scene.time.delayedCall(25, () => {this.jumping = false;});
+            this.airborne = true;
+            this.setVelocity(0, -this.jumpHeight);
+            this.jumpSFX.play();
+        }
+        // else if(this.jumping) {
+        //     this.addVelocity(0, -1);
+        // }
+        // console.log("jump executed");
     }
 
     land() {
         this.landing = true;
         this.airborne = false;
-        console.log(this.airborne);
+        this.setGravityY(this.jumpHeight);
+        // console.log(this.airborne);
     }
 
     attack() {
@@ -116,6 +132,6 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     getHurt() {
         this.hurting = true;
         this.hurtSFX.play();
-        this.scene.time.delayedCall(500, () => {this.hurting = false;});
+        this.scene.time.delayedCall(1000, () => {this.hurting = false;});
     }
 }

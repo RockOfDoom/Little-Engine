@@ -116,8 +116,6 @@ class Play extends Phaser.Scene {
             0,
             keyF,
             keySPACE).setOrigin(0.5,1);
-        //give engine gravity
-        this.engine.setGravityY(225);
         
         this.engine.anims.play("run");
         
@@ -188,6 +186,8 @@ class Play extends Phaser.Scene {
                     this.engine.land();
                 }
             });
+            //update enemies
+            this.enemy1.update(this.runSpeed);
 
             //update game pieces if game is not over
             if(!this.gameOver) {
@@ -225,8 +225,6 @@ class Play extends Phaser.Scene {
 
                 //update engine
                 this.engine.update(this.runSpeed, this.gas, this.aniFrame);
-                //update enemies
-                this.enemy1.update(this.runSpeed);
 
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
