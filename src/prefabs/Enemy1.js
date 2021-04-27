@@ -6,7 +6,7 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         //configure hitbox
         this.body.setSize(40, 50, true);
         this.body.setOffset(1, 14);
-        this.body.setImmovable() //prevent from faling
+        this.setGravityY(900); //give gravity
         this.anims.play("enemy1Run"); //play running animation
         this.scene = scene; //save scene for tween purposes
         this.goingRight = false; //keeps track of which way enemy is walking

@@ -4,6 +4,7 @@ class Fuel extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this); //add sprite to scene
         scene.physics.add.existing(this); //assign physics to sprite
         this.body.setImmovable(); //prevent from falling
+        this.revvSFX = scene.sound.add("engineRev");
     }
 
     update() {
@@ -15,6 +16,7 @@ class Fuel extends Phaser.Physics.Arcade.Sprite {
     }
 
     use() {
+        this.revvSFX.play();
         this.destroy();
     }
 }
