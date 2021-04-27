@@ -77,6 +77,7 @@ class Play extends Phaser.Scene {
         this.load.image("gameover ui", "./assets/gameover_ui_image.png");
         this.load.image("meter", "./assets/meter.png");
         this.load.image("platform", "./assets/platform.png");
+        this.load.image("fuel", "./assets/fuel.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -129,6 +130,10 @@ class Play extends Phaser.Scene {
 
         //create platform group
         this.platformGroup = this.add.group({
+            runChildUpdate: true
+        });
+        //create fuel pickup group
+        this.fuelGroup = this.add.group({
             runChildUpdate: true
         });
         
@@ -265,6 +270,12 @@ class Play extends Phaser.Scene {
                 //update engine
                 this.engine.update(this.gas, this.aniFrame);
 
+                //check to see if engine is picking up a fuel pickup
+                this.physics.world.collide(this.engine, this.fuelGroup, (engine, fuel) => {
+                    fuel.use();
+                    this.gas += 40;
+                });
+
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
                     console.log("gas overflow");
@@ -346,8 +357,16 @@ class Play extends Phaser.Scene {
         }
     }
 
-    spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it.
+    spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it and/or under it
         console.log("platform spawn go!");
-        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "platform", 0).setOrigin(0.5,0))
+        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "platform", 0).setOrigin(0.5,0));
+
+        //spawn things on top of platform
+        if(Math.random() >= 0.5) { //50/50 shot of fuel spawn
+            this.fuelGroup.add(new Fuel(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "fuel", 0).setOrigin(0.5,0));
+        }
+        else if(Math.random() >= 0.5) { //if no fuel, 50/50 shot of enemy spawn
+            //spawn enemy
+        }
     }
 }

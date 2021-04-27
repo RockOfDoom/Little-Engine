@@ -45,4 +45,8 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
             this.ticker++;
         }
     }
+
+    die() {
+        this.destroy();
+    }
 }
