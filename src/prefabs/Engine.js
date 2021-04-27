@@ -28,7 +28,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.tweening = 0;
     }
 
-    update(speed, gas, frame) {
+    update(gas, frame) {
         //change position on screen based on speed
         if(speed == loSpeed && this.x != borderUISize + this.width / 2 && this.tweening != 1) {
             this.tweening = 1;
@@ -68,8 +68,8 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.setVelocity(0,0);
         }
 
-        if(this.airborne && this.body.speed == 0) {
-            this.setGravityY(this.jumpHeight * 2);
+        if(this.airborne && this.body.speed == 0) { //fall faster after apex of jump is reached
+            this.setGravityY(this.jumpHeight * 3);
         }
 
         if(this.jKey.isDown) { //jump when jump input is recieved

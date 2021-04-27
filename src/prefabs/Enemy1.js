@@ -13,8 +13,8 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         this.totalSpeed = 0; //runSpeed from Play.js with this.walkSpeed either added or subtracted based on current direction
     }
 
-    update(speed) {
-        this.wander(speed);
+    update() {
+        this.wander();
         this.x -= this.totalSpeed;
 
         if(this.x < -this.width) {
@@ -26,7 +26,7 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         this.x = game.config.width + this.width + 10 * this.width;
     }
 
-    wander(speed) { //create illusion of walking left and right
+    wander() { //create illusion of walking left and right
         if(this.goingRight && this.ticker == 0) { //walk right
             this.totalSpeed = speed - this.walkSpeed;
             this.flipX = true;

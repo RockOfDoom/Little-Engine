@@ -7,7 +7,7 @@ class Play extends Phaser.Scene {
         loSpeed = 2;
         midSpeed = 4;
         hiSpeed = 8;
-        this.runSpeed = midSpeed; //current speed of the player
+        speed = midSpeed; //current speed of the player
         this.gas = 50; //how much gas the player has in the tank
         this.distance = 0; //how far the player has travelled
         this.gameOver = false; //if this is true, game ends. becomes true if gas & speed = 0
@@ -118,6 +118,11 @@ class Play extends Phaser.Scene {
             keySPACE).setOrigin(0.5,1);
         
         this.engine.anims.play("run");
+
+        //create platform group
+        this.platformGroup = this.add.group({
+            runChildUpdate: true
+        });
         
         // draw the game over UI with alpha at zero
         this.gameoverUI = this.add.sprite(
@@ -164,7 +169,7 @@ class Play extends Phaser.Scene {
         this.speedometerText = this.add.text(
             this.speedometer.x - borderUISize*1.5,
             this.speedometer.y + borderUISize/2,
-            Math.round(this.runSpeed*10),
+            Math.round(speed*10),
             numbersConfig
         );
     }
@@ -173,11 +178,11 @@ class Play extends Phaser.Scene {
         this.deltaTicker += delta; //update deltaTicker with milliseconds since last update()
         while(this.deltaTicker >= 16.666666) { //only perform updates 60 times per second
             //move backgrounds based on current speed
-            this.buildings.tilePositionX += this.runSpeed / 2;
-            this.mushrooms.tilePositionX += this.runSpeed - (this.runSpeed / 8);
-            this.groundbacking.tilePositionX += this.runSpeed;
-            this.ground.tilePositionX += this.runSpeed;
-            // console.log("speed: " + this.runSpeed);
+            this.buildings.tilePositionX += speed / 2;
+            this.mushrooms.tilePositionX += speed - (speed / 8);
+            this.groundbacking.tilePositionX += speed;
+            this.ground.tilePositionX += speed;
+            // console.log("speed: " + speed);
             // console.log("gas: " + this.gas);
 
             //make ground standable
@@ -187,7 +192,7 @@ class Play extends Phaser.Scene {
                 }
             });
             //update enemies
-            this.enemy1.update(this.runSpeed);
+            this.enemy1.update();
 
             //update game pieces if game is not over
             if(!this.gameOver) {
@@ -224,7 +229,7 @@ class Play extends Phaser.Scene {
                 });
 
                 //update engine
-                this.engine.update(this.runSpeed, this.gas, this.aniFrame);
+                this.engine.update(this.gas, this.aniFrame);
 
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
@@ -232,15 +237,15 @@ class Play extends Phaser.Scene {
                     this.gas = 100;
                 }
 
-                if(this.gas > 66 && this.runSpeed != hiSpeed) { //if engine has full tank, go to high speed
+                if(this.gas > 66 && speed != hiSpeed) { //if engine has full tank, go to high speed
                     console.log("hispeed set");
-                    this.runSpeed = hiSpeed;
-                } else if(this.gas >= 33 &&  this.gas <= 66 && this.runSpeed != midSpeed) { //if engine has half tank, go to medium speed
+                    speed = hiSpeed;
+                } else if(this.gas >= 33 &&  this.gas <= 66 && speed != midSpeed) { //if engine has half tank, go to medium speed
                     console.log("midspeed set");
-                    this.runSpeed = midSpeed;
-                } else if(this.gas > 0 && this.gas < 33 && this.runSpeed != loSpeed) { //if engine is low, but not empty, go to low speed
+                    speed = midSpeed;
+                } else if(this.gas > 0 && this.gas < 33 && speed != loSpeed) { //if engine is low, but not empty, go to low speed
                     console.log("lowspeed set");
-                    this.runSpeed = loSpeed;          
+                    speed = loSpeed;          
                 } else if(this.gas <= 0) {
                     //if player is out of gas, end game
                     this.gameOver = true;
@@ -257,7 +262,7 @@ class Play extends Phaser.Scene {
                 }
             }
             else { //game over screen
-                if (this.gameoverUITween == false && this.runSpeed == 0) {
+                if (this.gameoverUITween == false && speed == 0) {
                     this.gameoverUITween = true;
                     this.tweens.add({
                         targets: [this.gameoverUI],
@@ -265,11 +270,11 @@ class Play extends Phaser.Scene {
                         duration: 1000
                     });
                 }
-                if(this.runSpeed != 0) {
+                if(speed != 0) {
                     console.log("decelerating");
-                    this.runSpeed -= loSpeed * 0.005;
-                    if(this.runSpeed < 0) {
-                        this.runSpeed = 0;
+                    speed -= loSpeed * 0.005;
+                    if(speed < 0) {
+                        speed = 0;
                     }
                 } else {
                     if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
@@ -285,7 +290,11 @@ class Play extends Phaser.Scene {
 
             // updating the text on the fuel gauge and speedometer
             this.fuelGaugeText.text = Math.round(this.gas);
-            this.speedometerText.text = Math.round(this.runSpeed*10);
+            this.speedometerText.text = Math.round(speed*10);
         }
+    }
+
+    spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it.
+        this.platformGroup.add(new Platform(2 * game.config.width, (game.config.height / 2) + borderUISize, "", 0))
     }
 }

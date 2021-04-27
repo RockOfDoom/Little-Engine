@@ -18,7 +18,7 @@ let borderPadding = borderUISize / 3;
 
 
 let keySPACE, keyF; //configure input keys
-let loSpeed, midSpeed, hiSpeed; //configure speed levels
+let speed, loSpeed, midSpeed, hiSpeed; //configure speed levels
 
 let buildingsX = 0;
 let mushroomsX = 0;
