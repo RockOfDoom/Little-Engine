@@ -8,6 +8,7 @@ class Play extends Phaser.Scene {
         midSpeed = 4;
         hiSpeed = 8;
         speed = midSpeed; //current speed of the player
+        distance = 0; //initialize score
         this.gas = 50; //how much gas the player has in the tank
         this.distance = 0; //how far the player has travelled
         this.gameOver = false; //if this is true, game ends. becomes true if gas & speed = 0
@@ -223,6 +224,10 @@ class Play extends Phaser.Scene {
             //update enemies
             this.enemy1.update();
 
+            //update distance by 1 * speed per second
+            distance += speed / 60;
+            console.log(distance);
+
             //update game pieces if game is not over
             if(!this.gameOver) {
                 //increase speed every 30s
@@ -289,7 +294,7 @@ class Play extends Phaser.Scene {
                     }
                 }
 
-                //spawn platforms
+                //spawn platforms some frequency based on distance travelled
                 if(this.frameTick % this.platformFreq == 0) {
                     this.spawnPlatform();
                 }
@@ -330,13 +335,14 @@ class Play extends Phaser.Scene {
                     }
                 }
             }
-            //tick deltaTicker down once and frameTick up once
-            this.deltaTicker -= 16.666666;
-            this.frameTick++;
 
             // updating the text on the fuel gauge and speedometer
             this.fuelGaugeText.text = Math.round(this.gas);
             this.speedometerText.text = Math.round(speed*10);
+
+            //tick deltaTicker down once and frameTick up once
+            this.deltaTicker -= 16.666666;
+            this.frameTick++;
         }
     }
 
