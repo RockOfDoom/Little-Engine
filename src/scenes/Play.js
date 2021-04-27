@@ -308,6 +308,6 @@ class Play extends Phaser.Scene {
 
     spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it.
         console.log("platform spawn go!");
-        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + 2 * borderUISize, "platform", 0).setOrigin(0.5,0))
+        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + borderUISize, "platform", 0).setOrigin(0.5,0))
     }
 }
