@@ -183,6 +183,19 @@ class Play extends Phaser.Scene {
             Math.round(speed*10),
             numbersConfig
         );
+        // animate the gauges coming in
+        this.tweens.add({
+            targets: [this.fuelGauge, this.speedometer],
+            y: {from: 0 - this.speedometer.height, to: borderUISize/2},
+            duration: 500,
+            ease: "Back.Out"
+        });
+        this.tweens.add({
+            targets: [this.fuelGaugeText, this.speedometerText],
+            y: {from: 0 - this.speedometer.height + borderUISize/2, to: this.fuelGauge.y + borderUISize/2},
+            duration: 500,
+            ease: "Back.Out"
+        });
     }
 
     update(time, delta) {
@@ -280,7 +293,6 @@ class Play extends Phaser.Scene {
                 if(this.frameTick % this.platformFreq == 0) {
                     this.spawnPlatform();
                 }
-                this.gas = 0;
             }
             else { //game over screen
                 if (this.gameoverUITween == false && speed == 0) {

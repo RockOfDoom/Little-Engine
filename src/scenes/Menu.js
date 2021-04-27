@@ -9,6 +9,8 @@ class Menu extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image("menu meter", "./assets/menu_meter.png");
+        this.load.image("menu dial", "./assets/menu_dial.png");
         this.load.image("menu ui", "./assets/menu_ui_image.png");
         this.load.image("tutorial ui", "./assets/tutorial_ui_image.png");
         this.load.image("sun", "./assets/sun_background.png");
@@ -85,6 +87,8 @@ class Menu extends Phaser.Scene {
             0, 
             "menu ui"
             ).setOrigin(0, 0);
+
+
         if (lastScene == "menu" || lastScene == "tutorial") {
             this.tweens.add({
                 targets: [this.menuSprite],
@@ -100,6 +104,38 @@ class Menu extends Phaser.Scene {
                 duration: 2000
             });
         }
+
+        // meters
+        this.meter1 = this.add.sprite(
+            borderUISize,
+            config.height + 22,
+            "menu meter"
+            ).setOrigin(0, 1);
+        
+        this.meter2 = this.add.sprite(
+            config.width - borderUISize,
+            config.height + 22,
+            "menu meter"
+            ).setOrigin(1, 1);
+        
+
+        // dials
+        this.dial1 = this.add.sprite(
+            this.meter1.x + this.meter1.width/2,
+            this.meter1.y - this.meter1.height/2,
+            "menu dial"
+            ).setOrigin(.5, 1);
+
+        this.dial2 = this.add.sprite(
+            this.meter2.x - this.meter2.width/2,
+            this.meter2.y - this.meter2.height/2,
+            "menu dial"
+            ).setOrigin(.5, 1);
+
+        this.dial1.angle = Phaser.Math.RND.between(-112.5, 112.5);
+        this.dial2.angle = Phaser.Math.RND.between(-112.5, 112.5);
+        this.dial1Tweening = false;
+        this.dial2Tweening = false;
 
         this.anims.create({
             key: "run",
@@ -191,7 +227,39 @@ class Menu extends Phaser.Scene {
         this.buildings.tilePositionX += this.parallaxMovement;
         this.mushrooms.tilePositionX += this.parallaxMovement*1.5;
         this.groundbacking.tilePositionX += this.parallaxMovement*2;
-        //this.engine.y = Math.round(this.ground.y + config.height - 79);
 
+        if (this.dial1Tweening == false) {
+            console.log("here1");
+            this.dial1Tweening = true;
+            this.nextAngle1 = Phaser.Math.RND.between(-112.5, 112.5);
+            this.nextDuration1 = Phaser.Math.RND.between(2000, 4000);
+            this.nextWait1 = Phaser.Math.RND.between(1000, 2000);
+            this.tweens.add({
+                targets: [this.dial1],
+                angle: this.nextAngle1,
+                duration: this.nextDuration1,
+                ease: "Cubic.InOut"
+            }).on("complete", () => {
+                this.time.delayedCall(this.nextWait1, () => {
+                    this.dial1Tweening = false;
+            })});
+        }
+
+        if (this.dial2Tweening == false) {
+            console.log("here2");
+            this.dial2Tweening = true;
+            this.nextAngle2 = Phaser.Math.RND.between(-112.5, 112.5);
+            this.nextDuration2 = Phaser.Math.RND.between(2000, 4000);
+            this.nextWait2 = Phaser.Math.RND.between(1000, 2000);
+            this.tweens.add({
+                targets: [this.dial2],
+                angle: this.nextAngle2,
+                duration: this.nextDuration2,
+                ease: "Cubic.InOut"
+            }).on("complete", () => {
+                this.time.delayedCall(this.nextWait2, () => {
+                    this.dial2Tweening = false;
+            })});
+        }
     }
 }
