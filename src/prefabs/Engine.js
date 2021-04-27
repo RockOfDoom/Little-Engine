@@ -68,6 +68,10 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.setVelocity(0,0);
         }
 
+        if(!this.body.touching.down && !this.airborne) { //if player is aerial but not marked as such, mark them
+            this.airborne = true;
+        }
+
         if(this.airborne && this.body.speed == 0) { //fall faster after apex of jump is reached
             this.setGravityY(this.jumpHeight * 3);
         }

@@ -218,7 +218,7 @@ class Play extends Phaser.Scene {
                 }
             });
             this.physics.world.collide(this.engine, this.platformGroup, () => {
-                if(this.engine.airborne) { //if player has just touched ground, land
+                if(this.engine.airborne && this.engine.body.touching.down) { //if player has just landed on platform, land
                     this.engine.land();
                 }
             });
