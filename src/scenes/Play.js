@@ -14,12 +14,15 @@ class Play extends Phaser.Scene {
         this.deltaTicker = 0.0; //mechanism for capping game at 60fps
         this.frameTick = 0; //tracks how many times update() has run
         this.gasGuzzle = 1; //controls how quickly gas is consumed
+        this.platformFreq = 300; //controls the interval between platform spawns in ticks (60 per second)
+        this.intensity = 0; //controls the rate at which obstacles spawn, goes up over time
     }
 
     preload() {
         this.load.image("groundbox", "./assets/groundbox.png");
         this.load.image("gameover ui", "./assets/gameover_ui_image.png");
         this.load.image("meter", "./assets/meter.png");
+        this.load.image("platform", "./assets/platform.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -186,7 +189,7 @@ class Play extends Phaser.Scene {
             // console.log("gas: " + this.gas);
 
             //make ground standable
-            this.physics.world.collide(this.engine, this.groundBox, () => {
+            this.physics.world.collide(this.engine, [this.groundBox, this.platformGroup], () => {
                 if(this.engine.airborne) { //if player has just touched ground, land
                     this.engine.land();
                 }
@@ -252,13 +255,17 @@ class Play extends Phaser.Scene {
                     console.log("game over");
                 }
 
-
                 //consume gas based how long game has been going
                 if(this.gas > 0) {
                     this.gas -= 0.01666666 * this.gasGuzzle;
                     if(this.gas < 0) {
                         this.gas = 0;
                     }
+                }
+
+                //spawn platforms
+                if(this.frameTick % this.platformFreq == 0) {
+                    this.spawnPlatform();
                 }
             }
             else { //game over screen
@@ -295,6 +302,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnPlatform() { //spawn a new platform offscreen, and sometimes spawn something on it.
-        this.platformGroup.add(new Platform(2 * game.config.width, (game.config.height / 2) + borderUISize, "", 0))
+        console.log("platform spawn go!");
+        this.platformGroup.add(new Platform(this, 2 * game.config.width, game.config.height / 2 + 2 * borderUISize, "platform", 0).setOrigin(0.5,0))
     }
 }

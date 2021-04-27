@@ -8,7 +8,7 @@ class Platform extends Phaser.Physics.Arcade.Sprite {
     update() {
         this.x -= speed;
 
-        if(this.x < this.width) {
+        if(this.x < -this.width) {
             this.destroy();
         }
     }
