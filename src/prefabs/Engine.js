@@ -15,7 +15,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.body.setSize(40, 56, true);
         this.body.setOffset(1, 2.25);
         //give engine gravity
-        this.jumpHeight = 225;
+        this.jumpHeight = 300;
         this.setGravityY(this.jumpHeight);
         //define variables that track the current action the engine is performing
         this.running = true;

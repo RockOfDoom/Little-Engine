@@ -189,7 +189,12 @@ class Play extends Phaser.Scene {
             // console.log("gas: " + this.gas);
 
             //make ground standable
-            this.physics.world.collide(this.engine, [this.groundBox, this.platformGroup], () => {
+            this.physics.world.collide(this.engine, this.groundBox, () => {
+                if(this.engine.airborne) { //if player has just touched ground, land
+                    this.engine.land();
+                }
+            });
+            this.physics.world.collide(this.engine, this.platformGroup, () => {
                 if(this.engine.airborne) { //if player has just touched ground, land
                     this.engine.land();
                 }
