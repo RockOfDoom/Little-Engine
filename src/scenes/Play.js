@@ -81,6 +81,7 @@ class Play extends Phaser.Scene {
         this.load.image("platform", "./assets/platform.png");
         this.load.image("fuel", "./assets/fuel.png");
         this.load.image("play dial", "./assets/play_dial.png");
+        this.load.image("low fuel text", "./assets/low_fuel_text.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -88,6 +89,7 @@ class Play extends Phaser.Scene {
         this.load.audio("engineRev", "./assets/EngineRevvingEscortmarius.wav");
         this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
             {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
+        
     }
 
     create() {
@@ -95,6 +97,9 @@ class Play extends Phaser.Scene {
             loop: true
         });
         this.music.play();
+        
+        this.rev = this.sound.add("engineRev");
+        this.rev.play();
 
         this.engine.destroy();
         //define input keys
@@ -155,6 +160,15 @@ class Play extends Phaser.Scene {
         // this variable is used when u transition from game over to title screen
         this.transRectTween = false;
         
+        this.lowFuelText = this.add.sprite(
+            config.width/2,
+            -borderUISize,
+            "low fuel text"
+            ).setOrigin(.5, 0);
+        this.lowFuelTextShowing = false;
+        this.lowFuelTextTweening = false;
+        this.lowFuelText.tint = 0xFF0000;
+
         this.fuelDial = this.add.sprite(
             borderUISize/2 + 7,
             borderUISize/2 + 7,
@@ -182,8 +196,6 @@ class Play extends Phaser.Scene {
             borderUISize/2,
             "speedometer"
             ).setOrigin(1, 0);
-
-        
 
         // text for the meters... this will probaby be replaced later
         let numbersConfig = {
@@ -219,6 +231,18 @@ class Play extends Phaser.Scene {
             y: {from: 0 - this.speedometer.height + borderUISize/2, to: this.fuelGauge.y + borderUISize/2},
             duration: 500,
             ease: "Back.Out"
+        });
+        this.tweens.add({
+            targets: [this.fuelDial, this.speedDial],
+            y: {from: borderUISize/2 + 7 - this.speedometer.height, to: borderUISize/2 + 7},
+            duration: 500,
+            ease: "Back.Out"
+        });
+        this.input.keyboard.on("keydown-O", () => {
+            this.gas += 10;
+        });
+        this.input.keyboard.on("keydown-L", () => {
+            this.gas -= 10;
         });
     }
 
@@ -346,6 +370,35 @@ class Play extends Phaser.Scene {
                     this.spawnPlatform();
                 } else if(speed == loSpeed && this.frameTick % (this.platformFreq * 2) == 0) {
                     this.spawnPlatform();
+                }
+                // low fuel text
+                if (this.gas <= 33) {
+                    if (this.lowFuelTextTweening == false) {
+                        this.lowFuelTextTweening = true;
+                        this.tweens.add({
+                            targets: [this.lowFuelText],
+                            y: borderUISize * 3,
+                            duration: 500,
+                            ease: "Back.Out"
+                        }).on("complete", () => {
+                            this.lowFuelTextShowing = true;
+                            this.lowFuelTextTweening = false;
+                        });
+                    }
+                }
+                if (this.lowFuelTextShowing && this.gas > 33) {
+                    if (this.lowFuelTextTweening == false) {
+                        this.lowFuelTextTweening = true;
+                        this.tweens.add({
+                            targets: [this.lowFuelText],
+                            y: -borderUISize,
+                            duration: 500,
+                            ease: "Back.In"
+                        }).on("complete", () => {
+                            this.lowFuelTextShowing = false;
+                            this.lowFuelTextTweening = false;
+                        });
+                    }
                 }
             }
             else { //game over screen
