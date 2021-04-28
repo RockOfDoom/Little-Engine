@@ -76,9 +76,11 @@ class Play extends Phaser.Scene {
 
         this.load.image("groundbox", "./assets/groundbox.png");
         this.load.image("gameover ui", "./assets/gameover_ui_image.png");
-        this.load.image("meter", "./assets/meter.png");
+        this.load.image("speedometer", "./assets/speedometer.png");
+        this.load.image("fuel gauge", "./assets/fuel_gauge.png");
         this.load.image("platform", "./assets/platform.png");
         this.load.image("fuel", "./assets/fuel.png");
+        this.load.image("play dial", "./assets/play_dial.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -152,22 +154,35 @@ class Play extends Phaser.Scene {
         // this variable is used when u transition from game over to title screen
         this.transRectTween = false;
         
+        this.fuelDial = this.add.sprite(
+            borderUISize/2 + 7,
+            borderUISize/2 + 7,
+            "play dial"
+            ).setOrigin(.5, 0);
+        
+        this.speedDial = this.add.sprite(
+            config.width - borderUISize/2 - 7,
+            borderUISize /2 + 7,
+            "play dial"
+            ).setOrigin(.5, 0);
+
         // draw fuel gauge sprite
         // in the future this will have two sprites + numbers
         this.fuelGauge = this.add.sprite(
             borderUISize /2,
             borderUISize/2,
-            "meter"
+            "fuel gauge"
             ).setOrigin(0, 0);
         
         // draw speedometer sprite
         // same thing as above
         this.speedometer = this.add.sprite(
             config.width - borderUISize/2,
-             borderUISize/2,
-            "meter"
+            borderUISize/2,
+            "speedometer"
             ).setOrigin(1, 0);
-        this.speedometer.flipX = true;
+
+        
 
         // text for the meters... this will probaby be replaced later
         let numbersConfig = {
@@ -179,7 +194,7 @@ class Play extends Phaser.Scene {
             padding: 5,
         }
         this.fuelGaugeText = this.add.text(
-            this.fuelGauge.x + borderUISize/2,
+            this.fuelGauge.x + borderUISize*2,
             this.fuelGauge.y + borderUISize/2,
             Math.round(this.gas),
             numbersConfig
@@ -217,6 +232,11 @@ class Play extends Phaser.Scene {
             // console.log("speed: " + speed);
             // console.log("gas: " + this.gas);
 
+            // animate the dials
+            this.fuelDial.angle = ((100-this.gas)/100) * 90 - 90;
+            this.speedDial.angle = speed*10;
+            console.log(speed/100);
+            console.log(this.speedDial.angle);
             //make ground standable
             this.physics.world.collide(this.engine, this.groundBox, () => {
                 if(this.engine.airborne) { //if player has just touched ground, land
@@ -231,7 +251,7 @@ class Play extends Phaser.Scene {
 
             //update distance by 1 * speed per second
             distance += speed / 60;
-            console.log(distance);
+            //console.log(distance);
 
             //update game pieces if game is not over
             if(!this.gameOver) {

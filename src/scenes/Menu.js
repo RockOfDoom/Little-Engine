@@ -18,11 +18,14 @@ class Menu extends Phaser.Scene {
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
+        this.load.audio("select", "./assets/Select.wav");
         this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
             {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
     }
 
     create() {
+        // select sound
+        this.select = this.sound.add("select");
         // i only use the first frame but i load the whole animation anyway
         this.anims.create({
             key: "run",
@@ -163,6 +166,7 @@ class Menu extends Phaser.Scene {
         this.input.keyboard.on("keydown-SPACE", () => {
             if (this.isTweening == false) {
                 this.isTweening = true;
+                this.select.play();
                 this.tweens.add({
                     targets: [this.sun, this.buildings, this.mushrooms, this.groundbacking, this.ground],
                     y: 0,
@@ -195,7 +199,7 @@ class Menu extends Phaser.Scene {
 
                 // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
                 this.tweens.add({
-                    targets: [this.menuSprite],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
                     alpha: {from: 1, to: 0},
                     duration: this.tweenLength/2,
                 });
@@ -205,8 +209,9 @@ class Menu extends Phaser.Scene {
         this.input.keyboard.on("keydown-F", () => {
             if (this.isTweening == false) {
                 this.isTweening = true;
+                this.select.play();
                 this.tweens.add({
-                    targets: [this.menuSprite],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
                     alpha: {from: 1, to: 0},
                     duration: 500,
                 }).on("complete", () => {
@@ -229,7 +234,6 @@ class Menu extends Phaser.Scene {
         this.groundbacking.tilePositionX += this.parallaxMovement*2;
 
         if (this.dial1Tweening == false) {
-            console.log("here1");
             this.dial1Tweening = true;
             this.nextAngle1 = Phaser.Math.RND.between(-112.5, 112.5);
             this.nextDuration1 = Phaser.Math.RND.between(2000, 4000);
@@ -246,7 +250,6 @@ class Menu extends Phaser.Scene {
         }
 
         if (this.dial2Tweening == false) {
-            console.log("here2");
             this.dial2Tweening = true;
             this.nextAngle2 = Phaser.Math.RND.between(-112.5, 112.5);
             this.nextDuration2 = Phaser.Math.RND.between(2000, 4000);

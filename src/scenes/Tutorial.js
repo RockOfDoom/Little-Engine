@@ -13,6 +13,7 @@ class Tutorial extends Phaser.Scene {
     }
 
     create() {
+        this.select = this.sound.add("select");
         this.add.rectangle(
             0,
             0,
@@ -54,6 +55,7 @@ class Tutorial extends Phaser.Scene {
         this.input.keyboard.on("keydown-F", () => {
             if (this.isTweening == false) {
                 this.isTweening = true;
+                this.select.play();
                 this.tweens.add({
                     targets: [this.tutorialSprite],
                     alpha: {from: 1, to: 0},
