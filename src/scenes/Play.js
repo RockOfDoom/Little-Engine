@@ -82,6 +82,7 @@ class Play extends Phaser.Scene {
         this.load.image("fuel", "./assets/fuel.png");
         this.load.image("play dial", "./assets/play_dial.png");
         this.load.image("low fuel text", "./assets/low_fuel_text.png");
+        this.load.image("odometer","./assets/odometer.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -207,7 +208,7 @@ class Play extends Phaser.Scene {
             padding: 5,
         }
         this.fuelGaugeText = this.add.text(
-            this.fuelGauge.x + borderUISize*2,
+            this.fuelGauge.x + borderUISize,
             this.fuelGauge.y + borderUISize/2,
             Math.round(this.gas),
             numbersConfig
@@ -238,6 +239,35 @@ class Play extends Phaser.Scene {
             duration: 500,
             ease: "Back.Out"
         });
+
+        this.odometer = this.add.sprite(
+            config.width/2,
+            borderUISize,
+            "odometer"
+            ).setOrigin(.5, 0);
+        
+        numbersConfig.align = "center";
+        this.distanceText = this.add.text(
+            this.odometer.x,
+            this.odometer.y + borderUISize/2,
+            Math.round(distance),
+            numbersConfig
+            );
+
+        this.tweens.add({
+            targets: [this.odometer],
+            y: {from: -this.odometer.height, to: borderUISize},
+            duration: 500,
+            ease: "Back.Out"
+        });
+
+        this.tweens.add({
+            targets: [this.distanceText],
+            y: {from: -this.odometer.height + borderUISize/2, to: this.odometer.y + borderUISize/2},
+            duration: 500,
+            ease: "Back.Out"
+        });
+
         this.input.keyboard.on("keydown-O", () => {
             this.gas += 10;
         });
@@ -260,8 +290,6 @@ class Play extends Phaser.Scene {
             // animate the dials
             this.fuelDial.angle = ((100-this.gas)/100) * 90 - 90;
             this.speedDial.angle = speed*10;
-            console.log(speed/100);
-            console.log(this.speedDial.angle);
             //make ground standable
             this.physics.world.collide(this.engine, this.groundBox, () => {
                 if(this.engine.airborne) { //if player has just touched ground, land
@@ -279,7 +307,8 @@ class Play extends Phaser.Scene {
             this.physics.world.collide(this.enemy1Group, this.platformGroup);
 
             //update distance by 1 * speed per second
-            distance += speed / 60;
+            // speed is in miles per hour, so we convert that to feet per second
+            distance += (speed / 60) * 1.46667;
             //console.log(distance);
 
             //update game pieces if game is not over
@@ -377,7 +406,7 @@ class Play extends Phaser.Scene {
                         this.lowFuelTextTweening = true;
                         this.tweens.add({
                             targets: [this.lowFuelText],
-                            y: borderUISize * 3,
+                            y: borderUISize * 4,
                             duration: 500,
                             ease: "Back.Out"
                         }).on("complete", () => {
@@ -437,10 +466,12 @@ class Play extends Phaser.Scene {
                     }
                 }
             }
-
+            console.log(this.distanceText.text);
             // updating the text on the fuel gauge and speedometer
             this.fuelGaugeText.text = Math.round(this.gas);
             this.speedometerText.text = Math.round(speed*10);
+            this.distanceText.text = Math.round(distance);
+            
 
             //tick deltaTicker down once and frameTick up once
             this.deltaTicker -= 16.666666;
