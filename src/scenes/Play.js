@@ -16,7 +16,8 @@ class Play extends Phaser.Scene {
         this.frameTick = 0; //tracks how many times update() has run
         this.gasGuzzle = 1; //controls how quickly gas is consumed
         this.platformFreq = 300; //controls the interval between platform spawns in ticks (60 per second)
-        this.enemy1Freq = 600;
+        this.enemy1Freq = 600; //controls the interval between enemy spawns in ticks
+        this.obstacleFreq = 1500; //controls the interval between obstacle spawns in ticks
         this.intensity = 0; //controls the rate at which obstacles spawn, goes up over time
     }
 
@@ -83,6 +84,7 @@ class Play extends Phaser.Scene {
         this.load.image("play dial", "./assets/play_dial.png");
         this.load.image("low fuel text", "./assets/low_fuel_text.png");
         this.load.image("odometer","./assets/odometer.png");
+        this.load.image("obstacle","./assets/obstacle_shroom.png");
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -145,6 +147,10 @@ class Play extends Phaser.Scene {
         });
         //create fuel pickup group
         this.fuelGroup = this.add.group({
+            runChildUpdate: true
+        });
+        //create obstacle group
+        this.obstacleGroup = this.add.group({
             runChildUpdate: true
         });
         
@@ -313,8 +319,8 @@ class Play extends Phaser.Scene {
 
             //update game pieces if game is not over
             if(!this.gameOver) {
-                //increase speed every 30s
-                if(this.frameTick % 900 == 0) {
+                //increase speed every 10s
+                if(this.frameTick != 0 && this.frameTick % 600 == 0) {
                     hiSpeed += 0.5;
                     midSpeed += 0.5;
                     loSpeed += 0.5;
@@ -322,8 +328,8 @@ class Play extends Phaser.Scene {
                 }
 
                 //check collisions
-                this.physics.world.collide(this.engine, this.enemy1Group, (engine, enemy1) => {
-                    if(this.engine.damaging) {
+                this.physics.world.collide(this.engine, this.enemy1Group, (engine, enemy1) => { //check collision with enemies
+                    if(this.engine.damaging) { //if the player is in their attack sweet spot, kill enemy and add to gas
                         this.gas += 10; //* this.gasGuzzle;
                         enemy1.die();
                     }
@@ -344,15 +350,30 @@ class Play extends Phaser.Scene {
                         }
                     }
                 });
-
-                //update engine
-                this.engine.update(this.gas, this.aniFrame);
-
-                //check to see if engine is picking up a fuel pickup
-                this.physics.world.collide(this.engine, this.fuelGroup, (engine, fuel) => {
+                this.physics.world.collide(this.engine, this.obstacleGroup, (engine, obstacle) => { //check collision with obstacles
+                    if(!this.engine.hurting) {
+                        this.engine.getHurt();
+                        console.log("crash!");
+                        hiSpeed -= 1;
+                        if(hiSpeed < 4) {
+                            hiSpeed = 4;
+                        }
+                        midSpeed -= 1;
+                        if(midSpeed < 2) {
+                            midSpeed = 2;                        }
+                        loSpeed -= 1;
+                        if(loSpeed < 1) {
+                            loSpeed = 1;
+                        }
+                    }
+                });
+                this.physics.world.collide(this.engine, this.fuelGroup, (engine, fuel) => { //check collision with fuel pickups
                     fuel.use();
                     this.gas += 40;
                 });
+
+                //update engine
+                this.engine.update(this.gas, this.aniFrame);
 
                 //manage different fuel levels in engine
                 if(this.gas > 100) { //if engine overflows, don't
@@ -384,22 +405,32 @@ class Play extends Phaser.Scene {
                 }
 
                 //spawn enemies some frequency based on ticks and speed
-                if(speed == hiSpeed && this.frameTick % (this.enemy1Freq / 2) == 0) {
+                if(speed == hiSpeed && this.frameTick != 0 && this.frameTick % (this.enemy1Freq / 2) == 0) {
                     this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
-                } else if(speed == midSpeed && this.frameTick % this.enemy1Freq == 0) {
+                } else if(speed == midSpeed && this.frameTick != 0 && this.frameTick % this.enemy1Freq == 0) {
                     this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
-                } else if(speed == loSpeed && this.frameTick % (this.enemy1Freq * 2) == 0) {
+                } else if(speed == loSpeed && this.frameTick != 0 && this.frameTick % (this.enemy1Freq * 2) == 0) {
                     this.spawnEnemy1(game.config.width, game.config.height - 1.62 * borderUISize);
                 }
 
                 //spawn platforms some frequency based on ticks and speed
-                if(speed == hiSpeed && this.frameTick % (this.platformFreq / 2) == 0) {
+                if(speed == hiSpeed && this.frameTick != 0 && this.frameTick % (this.platformFreq / 2) == 0) {
                     this.spawnPlatform();
-                } else if(speed == midSpeed && this.frameTick % this.platformFreq == 0) {
+                } else if(speed == midSpeed && this.frameTick != 0 && this.frameTick % this.platformFreq == 0) {
                     this.spawnPlatform();
-                } else if(speed == loSpeed && this.frameTick % (this.platformFreq * 2) == 0) {
+                } else if(speed == loSpeed && this.frameTick != 0 && this.frameTick % (this.platformFreq * 2) == 0) {
                     this.spawnPlatform();
                 }
+
+                //spawn obstacles some frequency based on ticks and speed
+                if(speed == hiSpeed && this.frameTick != 0 && this.frameTick % (this.obstacleFreq / 2) == 0) {
+                    this.spawnObstacle(game.config.width);
+                } else if(speed == midSpeed && this.frameTick != 0 && this.frameTick % this.obstacleFreq == 0) {
+                    this.spawnObstacle(game.config.width);
+                } else if(speed == loSpeed && this.frameTick != 0 && this.frameTick % (this.obstacleFreq * 2) == 0) {
+                    this.spawnObstacle(game.config.width);
+                }
+
                 // low fuel text
                 if (this.gas <= 33) {
                     if (this.lowFuelTextTweening == false) {
@@ -489,12 +520,21 @@ class Play extends Phaser.Scene {
             0).setOrigin(0.5,0));
     }
 
-    spawnEnemy1(x, y) {
+    spawnEnemy1(x, y) { //spawn an enemy (type 1) at specified x and y coords
         this.enemy1Group.add(new Enemy1(
             this,
             x,
             y,
             "enemy1",
+            0).setOrigin(0.5,1));
+    }
+
+    spawnObstacle(x) { //spawn an obstacle on the ground at specified x coord
+        this.obstacleGroup.add(new Obstacle(
+            this,
+            x,
+            game.config.height - 1.62 * borderUISize,
+            "obstacle",
             0).setOrigin(0.5,1));
     }
 }
