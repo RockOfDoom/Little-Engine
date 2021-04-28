@@ -85,6 +85,7 @@ class Play extends Phaser.Scene {
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
         this.load.audio("music", "./assets/BackgroundMusic_mixdown4.wav");
+        this.load.audio("engineRev", "./assets/EngineRevvingEscortmarius.wav");
         this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
             {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
     }
@@ -248,6 +249,10 @@ class Play extends Phaser.Scene {
                     this.engine.land();
                 }
             });
+
+            //prevent enemies from falling
+            this.physics.world.collide(this.enemy1Group, this.groundBox);
+            this.physics.world.collide(this.enemy1Group, this.platformGroup);
 
             //update distance by 1 * speed per second
             distance += speed / 60;
