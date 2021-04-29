@@ -26,6 +26,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.landing = false;
         this.hurting = false;
         this.tweening = 0;
+        this.fastFalling = true;
     }
 
     update(gas, frame) {
@@ -68,10 +69,15 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.setVelocity(0,0);
         }
 
-        if(this.airborne && this.body.speed == 0) { //fall faster after apex of jump is reached
-            this.setGravityY(this.jumpHeight * 3);
+        if(!this.body.touching.down && !this.airborne) { //if player is aerial but not marked as such, mark them
+            this.airborne = true;
         }
 
+        if(this.airborne && (this.body.speed == 0 || this.fastFalling)) { //fall faster after apex of jump is reached
+            this.setGravityY(this.jumpHeight * 3);
+        }
+        
+        this.fastFalling = true;
         if(this.jKey.isDown) { //jump when jump input is recieved
             // console.log("jump initiated");
             this.jump();
@@ -85,10 +91,13 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     jump() {
         if(!this.airborne) {
             this.jumping = true;
+            this.fastFalling = false;
             this.scene.time.delayedCall(25, () => {this.jumping = false;});
             this.airborne = true;
             this.setVelocity(0, -this.jumpHeight);
             this.jumpSFX.play();
+        } else {
+            this.fastFalling = false;
         }
         // else if(this.jumping) {
         //     this.addVelocity(0, -1);
@@ -108,9 +117,9 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.scene.tweens.add({
             targets: [this],
             scale: {from: 1, to: 0.5},
-            duration: 250
+            duration: 125
         });
-        this.scene.time.delayedCall(250, () => {
+        this.scene.time.delayedCall(125, () => {
             if(!this.hurting) {
                 this.damaging = true;
                 this.atkSFX.play();
