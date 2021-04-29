@@ -83,6 +83,7 @@ class Play extends Phaser.Scene {
         this.load.image("play dial", "./assets/play_dial.png");
         this.load.image("low fuel text", "./assets/low_fuel_text.png");
         this.load.image("odometer","./assets/odometer.png");
+        this.load.spritesheet("numbers", "./assets/numbers.png", {frameWidth: 32, frameHeight: 50, start: 0, end: 9});
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
@@ -102,7 +103,14 @@ class Play extends Phaser.Scene {
         this.rev = this.sound.add("engineRev");
         this.rev.play();
 
-        this.engine.destroy();
+        this.engine.destroy(); // this isn't the real engine it's a sprite called engine that is made in the loading screen
+
+        this.anims.create({
+            key: "numbers",
+            frames: this.anims.generateFrameNumbers("numbers",
+                {start: 0, end: 9, first: 0}),
+        });
+
         //define input keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -198,28 +206,21 @@ class Play extends Phaser.Scene {
             "speedometer"
             ).setOrigin(1, 0);
 
-        // text for the meters... this will probaby be replaced later
-        let numbersConfig = {
-            fontFamily: "Verdana",
-            fontSize: "24px",
-            color: "#000",
-            backgroundColor: "#fff",
-            align: "center",
-            padding: 5,
-        }
-        this.fuelGaugeText = this.add.text(
+        this.fuelGaugeTextRenderer = new NumberRenderer(
+            this, 
             this.fuelGauge.x + borderUISize,
             this.fuelGauge.y + borderUISize/2,
             Math.round(this.gas),
-            numbersConfig
-        );
-        numbersConfig.align = "left";
-        this.speedometerText = this.add.text(
-            this.speedometer.x - borderUISize*1.5,
-            this.speedometer.y + borderUISize/2,
-            Math.round(speed*10),
-            numbersConfig
-        );
+            2
+            );
+
+        this.speedometerTextRenderer = new NumberRenderer(
+            this,
+            this.speedometer.x - borderUISize*2 + 3,
+            this.fuelGauge.y + borderUISize/2,
+            Math.round(this.speed*10),
+            2
+            );
         // animate the gauges coming in
         this.tweens.add({
             targets: [this.fuelGauge, this.speedometer],
@@ -228,7 +229,7 @@ class Play extends Phaser.Scene {
             ease: "Back.Out"
         });
         this.tweens.add({
-            targets: [this.fuelGaugeText, this.speedometerText],
+            targets: [this.fuelGaugeTextRenderer, this.speedometerTextRenderer],
             y: {from: 0 - this.speedometer.height + borderUISize/2, to: this.fuelGauge.y + borderUISize/2},
             duration: 500,
             ease: "Back.Out"
@@ -245,14 +246,15 @@ class Play extends Phaser.Scene {
             borderUISize,
             "odometer"
             ).setOrigin(.5, 0);
-        
-        numbersConfig.align = "center";
-        this.distanceText = this.add.text(
-            this.odometer.x,
+
+        this.distanceTextRenderer = new NumberRenderer(
+            this,
+            this.odometer.x - this.odometer.width/2 + borderUISize,
             this.odometer.y + borderUISize/2,
             Math.round(distance),
-            numbersConfig
+            6
             );
+        this.distanceNumberPlace = 1;
 
         this.tweens.add({
             targets: [this.odometer],
@@ -466,11 +468,10 @@ class Play extends Phaser.Scene {
                     }
                 }
             }
-            console.log(this.distanceText.text);
             // updating the text on the fuel gauge and speedometer
-            this.fuelGaugeText.text = Math.round(this.gas);
-            this.speedometerText.text = Math.round(speed*10);
-            this.distanceText.text = Math.round(distance);
+            this.fuelGaugeTextRenderer.updateNumbers(Math.round(this.gas));
+            this.speedometerTextRenderer.updateNumbers(Math.round(speed*10));
+            this.distanceTextRenderer.updateNumbers(Math.round(distance));
             
 
             //tick deltaTicker down once and frameTick up once
