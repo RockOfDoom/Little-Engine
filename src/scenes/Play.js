@@ -260,7 +260,7 @@ class Play extends Phaser.Scene {
             Math.round(distance),
             6
             );
-        this.distanceNumberPlace = 1;
+
 
         this.tweens.add({
             targets: [this.odometer],
@@ -270,8 +270,8 @@ class Play extends Phaser.Scene {
         });
 
         this.tweens.add({
-            targets: [this.distanceText],
-            y: {from: -this.odometer.height + borderUISize/2, to: this.odometer.y + borderUISize/2},
+            targets: [this.distanceTextRenderer],
+            y: {from: -this.odometer.height + borderUISize/2, to: this.odometer.y + borderUISize/2-2},
             duration: 500,
             ease: "Back.Out"
         });
