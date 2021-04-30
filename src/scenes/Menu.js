@@ -98,33 +98,6 @@ class Menu extends Phaser.Scene {
             "names"
             ).setOrigin(.5,1);
 
-        if (lastScene == "menu" || lastScene == "tutorial") {
-            this.time.delayedCall(250, () => {
-                this.tweens.add({
-                    targets: [this.menuSprite],
-                    y: {from: -config.height*.5, to: 0},
-                    duration: 750,
-                    ease: "Back.Out"
-                });
-            });
-            this.time.delayedCall(1125, () => {
-                this.tweens.add({
-                    targets: [this.names],
-                    y: {from: config.height*1.25, to: config.height - borderUISize},
-                    duration: 750,
-                    ease: "Back.Out"
-                });
-            });
-        } else if (lastScene == "play") {
-            this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
-            this.transRect.setDepth(101);
-            this.tweens.add({
-                targets: [this.transRect],
-                alpha: {from: 1, to: 0},
-                duration: 2000
-            });
-        }
-
         // meters
         this.meter1 = this.add.sprite(
             borderUISize,
@@ -216,7 +189,7 @@ class Menu extends Phaser.Scene {
 
                 // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
                 this.tweens.add({
-                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2, this.names],
                     alpha: {from: 1, to: 0},
                     duration: this.tweenLength/2,
                 });
@@ -228,7 +201,7 @@ class Menu extends Phaser.Scene {
                 this.isTweening = true;
                 this.select.play();
                 this.tweens.add({
-                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2, this.names],
                     alpha: {from: 1, to: 0},
                     duration: 500,
                 }).on("complete", () => {
@@ -238,6 +211,41 @@ class Menu extends Phaser.Scene {
                 });
             }
         });
+
+        if (lastScene == "menu" || lastScene == "tutorial") {
+            this.time.delayedCall(250, () => {
+                this.tweens.add({
+                    targets: [this.menuSprite],
+                    y: {from: -config.height*.5, to: 0},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
+            });
+            this.time.delayedCall(1125, () => {
+                this.tweens.add({
+                    targets: [this.names],
+                    y: {from: config.height*1.25, to: config.height - borderUISize},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
+            });
+        } else if (lastScene == "play") {
+            this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
+            this.transRect.setDepth(101);
+            this.tweens.add({
+                targets: [this.transRect],
+                alpha: {from: 1, to: 0},
+                duration: 2000
+            });
+        } 
+        if (lastScene == "tutorial") {
+            this.tweens.add({
+                targets: [this.dial1, this.dial2, this.meter1, this.meter2],
+                alpha: {from: 0, to: 1},
+                duration: 500
+            });
+            console.log('ea');
+        }
     }
 
     update() {
