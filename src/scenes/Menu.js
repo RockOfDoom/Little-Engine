@@ -18,6 +18,7 @@ class Menu extends Phaser.Scene {
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
+        this.load.image("names", "./assets/names.png");
         this.load.audio("select", "./assets/Select.wav");
         this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
             {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
@@ -87,16 +88,32 @@ class Menu extends Phaser.Scene {
         // in the future i would like to make this two or three sprites and change the way they tween induvidually
         this.menuSprite = this.add.sprite(
             0, 
-            0, 
+            -config.height*.75, 
             "menu ui"
             ).setOrigin(0, 0);
-
+        
+        this.names = this.add.sprite(
+            config.width/2,
+            config.height*1.25,
+            "names"
+            ).setOrigin(.5,1);
 
         if (lastScene == "menu" || lastScene == "tutorial") {
-            this.tweens.add({
-                targets: [this.menuSprite],
-                alpha: {from: 0, to: 1},
-                duration: 500,
+            this.time.delayedCall(250, () => {
+                this.tweens.add({
+                    targets: [this.menuSprite],
+                    y: {from: -config.height*.5, to: 0},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
+            });
+            this.time.delayedCall(1125, () => {
+                this.tweens.add({
+                    targets: [this.names],
+                    y: {from: config.height*1.25, to: config.height - borderUISize},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
             });
         } else if (lastScene == "play") {
             this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
