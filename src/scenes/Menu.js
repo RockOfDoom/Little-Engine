@@ -12,14 +12,18 @@ class Menu extends Phaser.Scene {
         this.load.image("menu meter", "./assets/menu_meter.png");
         this.load.image("menu dial", "./assets/menu_dial.png");
         this.load.image("menu ui", "./assets/menu_ui_image.png");
-        this.load.image("tutorial ui", "./assets/tutorial_ui_image.png");
         this.load.image("sun", "./assets/sun_background.png");
         this.load.image("buildings", "./assets/buildings_background.png");
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
         this.load.image("names", "./assets/names.png");
+        this.load.image("tutorial label", "./assets/tutorial_label.png");
+        this.load.image("tutorial1", "./assets/tutorial1.png");
+        this.load.image("tutorial2", "./assets/tutorial2.png");
         this.load.audio("select", "./assets/Select.wav");
+        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
+            {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
         this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
             {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
     }

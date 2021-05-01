@@ -9,6 +9,7 @@ let config = {
         }
     },
     scene: [Menu, Play, Tutorial],
+    pixelArt: true
 };
 
 let game = new Phaser.Game(config);
