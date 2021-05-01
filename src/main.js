@@ -1,3 +1,16 @@
+// LITTLE ENGINE 5/2/2021
+// 
+// Alex Basinski                - programming, game design
+// Alexa Wilbert                - audio design, art
+// Ardent Eliot :-) Reinhard    - UI/UX 
+// Star Hagen-Esquerra          - art
+//
+// FONTS USED:
+// Fredoka One
+// Berlin Sans FB
+//
+// Twemoji: https://creativecommons.org/licenses/by/4.0/
+
 let config = {
     type: Phaser.AUTO,
     width: 640,
