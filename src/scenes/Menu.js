@@ -51,6 +51,7 @@ class Menu extends Phaser.Scene {
             ).setOrigin(0, 0);
         
         // the next five tile sprites are what make up the background of the game 
+        // everything but sky and buildings are positioned off screen so the player can't see them by default
         this.sun = this.add.tileSprite(
             0, 
             this.bgOffset, 
@@ -128,12 +129,14 @@ class Menu extends Phaser.Scene {
             this.meter2.y - this.meter2.height/2,
             "menu dial"
             ).setOrigin(.5, 1);
-
+        
+        // randomly set the dials to a position
         this.dial1.angle = Phaser.Math.RND.between(-112.5, 112.5);
         this.dial2.angle = Phaser.Math.RND.between(-112.5, 112.5);
-        this.dial1Tweening = false;
-        this.dial2Tweening = false;
-
+        this.dial1Tweening = false;     // so we don't interupt a tween
+        this.dial2Tweening = false;     // ^^
+        
+        // so we can put the little guy running at the bottom of the screen for the transition
         this.anims.create({
             key: "run",
             frames: this.anims.generateFrameNumbers("fireguy",
@@ -161,12 +164,17 @@ class Menu extends Phaser.Scene {
             if (this.isTweening == false) {
                 this.isTweening = true;
                 this.select.play();
+
+                // this moves everything in the scene up until they are at 0,0 so it looks like the
+                //camera is moving down until it gets to engine
+                // notably, all of the sprites are 640x480
                 this.tweens.add({
                     targets: [this.sun, this.buildings, this.mushrooms, this.groundbacking, this.ground],
                     y: 0,
                     duration: this.tweenLength,
                     ease: this.tweenEase
                 }).on("complete", () => {
+                    // this itle posiiton stuff is so that the next scene transitions well and it looks smooth
                     buildingsX = this.buildings.tilePositionX + this.parallaxMovement;
                     mushroomsX = this.mushrooms.tilePositionX + this.parallaxMovement;
                     groundbackingX =this.groundbacking.tilePositionX + this.parallaxMovement;
@@ -199,11 +207,14 @@ class Menu extends Phaser.Scene {
                 });
             }
         });
-
+        
+        // transition to the tutorial
         this.input.keyboard.on("keydown-F", () => {
             if (this.isTweening == false) {
-                this.isTweening = true;
+                this.isTweening = true; // only one tween at once 
                 this.select.play();
+
+                // they all fade out
                 this.tweens.add({
                     targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2, this.names],
                     alpha: {from: 1, to: 0},
@@ -216,7 +227,11 @@ class Menu extends Phaser.Scene {
             }
         });
 
+        // different transitions based on the previous scene
+        // the default for "lastScene" is "menu", so that is what will happen when u open the game
         if (lastScene == "menu" || lastScene == "tutorial") {
+
+            // after a delay, moves the title and the text to the center of the screen
             this.time.delayedCall(250, () => {
                 this.tweens.add({
                     targets: [this.menuSprite],
@@ -225,6 +240,8 @@ class Menu extends Phaser.Scene {
                     ease: "Back.Out"
                 });
             });
+
+            // after a delay, moves the names onscreen. i like the rhythm of it 💖💖💖 the ux of it all
             this.time.delayedCall(1125, () => {
                 this.tweens.add({
                     targets: [this.names],
@@ -233,6 +250,9 @@ class Menu extends Phaser.Scene {
                     ease: "Back.Out"
                 });
             });
+
+        // here, i make it transition from a black square, cuz i draw one at the end of the play scene
+        // from there, i just put everything in place no need to tween them again
         } else if (lastScene == "play") {
             this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
             this.transRect.setDepth(101);
@@ -245,6 +265,7 @@ class Menu extends Phaser.Scene {
             this.names.y = config.height - borderUISize;
             
         } 
+        // i dont remember why this is here but i do know that it has to be here 💖💖
         if (lastScene == "tutorial") {
             this.tweens.add({
                 targets: [this.dial1, this.dial2, this.meter1, this.meter2],
@@ -256,20 +277,32 @@ class Menu extends Phaser.Scene {
     }
 
     update() {
+        // i round everything or else it looks uggy when they are trying to draw it at not integer coordinates
         this.sun.y = Math.round(this.sun.y);
         this.buildings.y = Math.round(this.buildings.y);
         this.mushrooms.y = Math.round(this.mushrooms.y);
         this.groundbacking.y = Math.round(this.groundbacking.y);
         this.ground.y = Math.round(this.ground.y);
+
+        // these are so they look good on the transitions between scenes
         this.buildings.tilePositionX += this.parallaxMovement;
         this.mushrooms.tilePositionX += this.parallaxMovement*1.5;
         this.groundbacking.tilePositionX += this.parallaxMovement*2;
 
+        // this is all for the dials
+        // it kinda took me a while but they look super cute so 🤔🤔🤔
+        // it's the little things that add up, you know 
         if (this.dial1Tweening == false) {
-            this.dial1Tweening = true;
+            this.dial1Tweening = true; 
+
+            // the next angle that the dial will have on the next tween
             this.nextAngle1 = Phaser.Math.RND.between(-112.5, 112.5);
+            // how long the next angle will take to get there
             this.nextDuration1 = Phaser.Math.RND.between(2000, 4000);
+            // how long it will stay at that angle for
             this.nextWait1 = Phaser.Math.RND.between(1000, 2000);
+
+            // then i just tween the rotation using those variables
             this.tweens.add({
                 targets: [this.dial1],
                 angle: this.nextAngle1,
@@ -278,9 +311,12 @@ class Menu extends Phaser.Scene {
             }).on("complete", () => {
                 this.time.delayedCall(this.nextWait1, () => {
                     this.dial1Tweening = false;
-            })});
+            })});   // idk why this line is like that but it is so ugly lol
+                    // i like phaser but sometimes javascript is ugly with the parathesis and curly bracers
+    
         }
 
+        // it's the same as above. in THEORY i could have used a for loop or a function but w/e
         if (this.dial2Tweening == false) {
             this.dial2Tweening = true;
             this.nextAngle2 = Phaser.Math.RND.between(-112.5, 112.5);

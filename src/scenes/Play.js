@@ -22,6 +22,7 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
+        // load this stuff here so that it isn't black when loading everything in
         //display sky
         this.sky = this.add.tileSprite(
             0,
@@ -162,8 +163,10 @@ class Play extends Phaser.Scene {
             runChildUpdate: true
         });
         
+        // this is all of the UI stuff in create i just moved them cuz create was getting p full
         this.drawUI();
-
+        
+        // ayyy cheat codes 👀👀👀
         this.input.keyboard.on("keydown-O", () => {
             this.gas += 10;
         });
@@ -181,11 +184,14 @@ class Play extends Phaser.Scene {
             this.groundbacking.tilePositionX += speed;
             this.ground.tilePositionX += speed;
             // console.log("speed: " + speed);
-            // console.log("gas: " + this.gas);
 
             // animate the dials
+            // i don't know how angles work, these numbers are wizardry
+            // so don't mess with them lol it will break
+            // it took me so long to find the speed dial angle and it ended up being so simple T_T
             this.fuelDial.angle = ((100-this.gas)/100) * 90 - 90;
             this.speedDial.angle = speed*10;
+
             //make ground standable
             this.physics.world.collide(this.engine, this.groundBox, () => {
                 if(this.engine.airborne) { //if player has just touched ground, land
@@ -322,6 +328,9 @@ class Play extends Phaser.Scene {
                 }
 
                 // low fuel text
+                // this code is bad but i don't wnat to change it cuz it works
+                // it being bad is the reason i can't make the text flash lol
+                // i don't wanna look at it to explain it so just trust me it works uwu
                 if (this.gas <= 33) {
                     if (this.lowFuelTextTweening == false) {
                         this.lowFuelTextTweening = true;
@@ -351,31 +360,40 @@ class Play extends Phaser.Scene {
                     }
                 }
             }
-            else { //game over screen
-                if (this.gameoverUITween == false && speed == 0) {
+            else { 
+                //game over screen
+                if (this.gameoverUITween == false && speed == 0) { 
                     this.gameoverUITween = true;
+                    // adds the game over UI sprite
                     this.gameoverUI = this.add.sprite(
                         0,
                         0,
                         "gameover ui"
                         ).setOrigin(0, 0);
                     this.gameoverUI.alpha = 0;
+                    // tweens the game over UI sprite so it fades in
                     this.tweens.add({
                         targets: [this.gameoverUI],
                         alpha: {from: 0, to: 1},
                         duration: 1000
                     }).on("complete", () => {
                         for(let i = 0; i < 6; i++) {
+                            // moves each of the distance text sprites so they are over the game over sprite
                             if(this.distanceTextRenderer.numberSprites[i] != undefined) {
                                 this.distanceTextRenderer.numberSprites[i].setDepth(101);
                                 console.log(this.distanceTextRenderer.numberSprites[i].depth);
                             }
                         }
+                        // moves the numbers from the odometer to the middle of the game over sprite
+                        // alternatively i could just draw more numbers in this place and fade them in with the game over sprite
+                        // but i think this is cute :>
                         this.tweens.add({
                             targets: [this.distanceTextRenderer],
                             y: borderUISize *6.25,
                             duration: 1000,
                             ease: "Cubic.Out"
+                        }).on("complete", () => {
+                            this.gameoverFinishedDrawing = true;
                         });
                     });
                 }
@@ -385,28 +403,36 @@ class Play extends Phaser.Scene {
                     if(speed < 0) {
                         speed = 0;
                     }
-                } else {
+                } else if (this.gameoverFinishedDrawing) {
+                    // this stuff is for the controls after the game over sprite is loaded on and everything
                     if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
+                        // this just restarts the scene. easy. no tweening or transitioning nessicary
                         this.scene.start("playScene");
                     } else if (Phaser.Input.Keyboard.JustDown(keyF) && this.transRectTween == false) {
-                        this.transRectTween = true;
+                        this.transRectTween = true; // so i only tween it once
+
+                        // hehe transgender rectangle
+                        // this is a black rectangle that fades in at the end of this scene 
+                        // and fades out at the end of the next one
                         this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
-                        this.transRect.setDepth(101);
+                        // i dont know if this part is nessicary but that's ok it works
+                        this.transRect.setDepth(102);
                         this.transRect.alpha = 0;
-                        console.log("here");
+                        // this is the fade
                         this.tweens.add({
                             targets: [this.transRect],
                             alpha: {from: 0, to: 1},
                             duration: 1000
                         }).on("complete", () => {
                             lastScene = "play";
+                            // and start the next scene
                             this.scene.start("menuScene");
                         });
                         
                     }
                 }
             }
-            // updating the text on the fuel gauge and speedometer
+            // updating the text on the fuel gauge and speedometer and odometer
             this.fuelGaugeTextRenderer.updateNumbers(Math.round(this.gas));
             this.speedometerTextRenderer.updateNumbers(Math.round(speed*10));
             this.distanceTextRenderer.updateNumbers(Math.round(distance));
@@ -447,28 +473,35 @@ class Play extends Phaser.Scene {
     }
 
     drawUI() {
-        // draw the game over UI with alpha at zero
-        
         this.gameoverUITween = false;
+        this.gameoverFinishedDrawing = false;
         
         // this variable is used when u transition from game over to title screen
         this.transRectTween = false;
         
+        // this is the text that says "low fuel" with comes onscreen when you are at <34 fuel
         this.lowFuelText = this.add.sprite(
             config.width/2,
             -borderUISize,
             "low fuel text"
             ).setOrigin(.5, 0);
-        this.lowFuelTextShowing = false;
-        this.lowFuelTextTweening = false;
-        this.lowFuelText.tint = 0xFF0000;
-
+        this.lowFuelTextShowing = false;    // it's always there but by default is just offscreen
+        this.lowFuelTextTweening = false;   // cuz there are two tweens so i dont want them happening at the same time
+        this.lowFuelText.tint = 0xFF0000;   // i was gonna make them flash but then i couldn't figure it out cuz i wrote bad code
+                                            // also the image is white so i make it red
+        
+        // this is part one of three of the fuel dial
+        // the fuel and speed dials are essentially the same tbh
+        // this part draws the needle or dial
+        // idk exactly what it's called and i don't wanna look it up
+        // but i call it a dial in this code lol so that's what it is
         this.fuelDial = this.add.sprite(
             borderUISize/2 + 7,
             borderUISize/2 + 7,
             "play dial"
             ).setOrigin(.5, 0);
-        
+
+        // same as above
         this.speedDial = this.add.sprite(
             config.width - borderUISize/2 - 7,
             borderUISize /2 + 7,
@@ -476,7 +509,7 @@ class Play extends Phaser.Scene {
             ).setOrigin(.5, 0);
 
         // draw fuel gauge sprite
-        // in the future this will have two sprites + numbers
+        // this part is the arc and the circle in the corner
         this.fuelGauge = this.add.sprite(
             borderUISize /2,
             borderUISize/2,
@@ -490,7 +523,10 @@ class Play extends Phaser.Scene {
             borderUISize/2,
             "speedometer"
             ).setOrigin(1, 0);
-
+        
+        // i call this "text rendereer" when really it renders numbers
+        // but are numbers not text? much to consider 🔢🔢🔢
+        // anyway this is what puts the numbers on screen
         this.fuelGaugeTextRenderer = new NumberRenderer(
             this, 
             this.fuelGauge.x + borderUISize,
@@ -498,7 +534,7 @@ class Play extends Phaser.Scene {
             Math.round(this.gas),
             2
             );
-
+        // same as above
         this.speedometerTextRenderer = new NumberRenderer(
             this,
             this.speedometer.x - borderUISize*2 + 3,
@@ -506,7 +542,9 @@ class Play extends Phaser.Scene {
             Math.round(this.speed*10),
             2
             );
+
         // animate the gauges coming in
+        // i dont remember what the "y"s all are but it looks good so i'm not changing it
         this.tweens.add({
             targets: [this.fuelGauge, this.speedometer],
             y: {from: 0 - this.speedometer.height, to: borderUISize/2},
@@ -526,12 +564,14 @@ class Play extends Phaser.Scene {
             ease: "Back.Out"
         });
 
+        // this is for the odometer, in the center of the screen, which counts distance in feet
         this.odometer = this.add.sprite(
             config.width/2,
             borderUISize,
             "odometer"
             ).setOrigin(.5, 0);
-
+        
+        // this is the same deal as the fuel gauge and the speedometer but there are 6 decimal places instead of 2
         this.distanceTextRenderer = new NumberRenderer(
             this,
             this.odometer.x - this.odometer.width/2 + borderUISize - 2,
@@ -540,7 +580,7 @@ class Play extends Phaser.Scene {
             6
             );
 
-
+        // moves them into place at the start of the scene
         this.tweens.add({
             targets: [this.odometer],
             y: {from: -this.odometer.height, to: borderUISize},
