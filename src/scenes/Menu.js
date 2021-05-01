@@ -12,13 +12,18 @@ class Menu extends Phaser.Scene {
         this.load.image("menu meter", "./assets/menu_meter.png");
         this.load.image("menu dial", "./assets/menu_dial.png");
         this.load.image("menu ui", "./assets/menu_ui_image.png");
-        this.load.image("tutorial ui", "./assets/tutorial_ui_image.png");
         this.load.image("sun", "./assets/sun_background.png");
         this.load.image("buildings", "./assets/buildings_background.png");
         this.load.image("mushrooms", "./assets/mushrooms_background.png");
         this.load.image("groundbacking", "./assets/groundbacking.png");
         this.load.image("ground", "./assets/ground.png");
+        this.load.image("names", "./assets/names.png");
+        this.load.image("tutorial label", "./assets/tutorial_label.png");
+        this.load.image("tutorial1", "./assets/tutorial1.png");
+        this.load.image("tutorial2", "./assets/tutorial2.png");
         this.load.audio("select", "./assets/Select.wav");
+        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
+            {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
         this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
             {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
     }
@@ -87,26 +92,15 @@ class Menu extends Phaser.Scene {
         // in the future i would like to make this two or three sprites and change the way they tween induvidually
         this.menuSprite = this.add.sprite(
             0, 
-            0, 
+            -config.height*.75, 
             "menu ui"
             ).setOrigin(0, 0);
-
-
-        if (lastScene == "menu" || lastScene == "tutorial") {
-            this.tweens.add({
-                targets: [this.menuSprite],
-                alpha: {from: 0, to: 1},
-                duration: 500,
-            });
-        } else if (lastScene == "play") {
-            this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
-            this.transRect.setDepth(101);
-            this.tweens.add({
-                targets: [this.transRect],
-                alpha: {from: 1, to: 0},
-                duration: 2000
-            });
-        }
+        
+        this.names = this.add.sprite(
+            config.width/2,
+            config.height*1.25,
+            "names"
+            ).setOrigin(.5,1);
 
         // meters
         this.meter1 = this.add.sprite(
@@ -199,7 +193,7 @@ class Menu extends Phaser.Scene {
 
                 // this tweens the ui sprite to alpha = 0 so that it is gone by the time the play scene starts
                 this.tweens.add({
-                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2, this.names],
                     alpha: {from: 1, to: 0},
                     duration: this.tweenLength/2,
                 });
@@ -211,7 +205,7 @@ class Menu extends Phaser.Scene {
                 this.isTweening = true;
                 this.select.play();
                 this.tweens.add({
-                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2],
+                    targets: [this.menuSprite, this.dial1, this.dial2, this.meter1, this.meter2, this.names],
                     alpha: {from: 1, to: 0},
                     duration: 500,
                 }).on("complete", () => {
@@ -221,6 +215,44 @@ class Menu extends Phaser.Scene {
                 });
             }
         });
+
+        if (lastScene == "menu" || lastScene == "tutorial") {
+            this.time.delayedCall(250, () => {
+                this.tweens.add({
+                    targets: [this.menuSprite],
+                    y: {from: -config.height*.5, to: 0},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
+            });
+            this.time.delayedCall(1125, () => {
+                this.tweens.add({
+                    targets: [this.names],
+                    y: {from: config.height*1.25, to: config.height - borderUISize},
+                    duration: 750,
+                    ease: "Back.Out"
+                });
+            });
+        } else if (lastScene == "play") {
+            this.transRect = this.add.rectangle(0, 0, config.width, config.height, 0x000).setOrigin(0, 0);
+            this.transRect.setDepth(101);
+            this.tweens.add({
+                targets: [this.transRect],
+                alpha: {from: 1, to: 0},
+                duration: 2000
+            });
+            this.menuSprite.y = 0;
+            this.names.y = config.height - borderUISize;
+            
+        } 
+        if (lastScene == "tutorial") {
+            this.tweens.add({
+                targets: [this.dial1, this.dial2, this.meter1, this.meter2],
+                alpha: {from: 0, to: 1},
+                duration: 500
+            });
+            console.log('ea');
+        }
     }
 
     update() {
