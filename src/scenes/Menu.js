@@ -237,6 +237,9 @@ class Menu extends Phaser.Scene {
                 alpha: {from: 1, to: 0},
                 duration: 2000
             });
+            this.menuSprite.y = 0;
+            this.names.y = config.height - borderUISize;
+            
         } 
         if (lastScene == "tutorial") {
             this.tweens.add({

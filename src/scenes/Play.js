@@ -162,119 +162,7 @@ class Play extends Phaser.Scene {
             runChildUpdate: true
         });
         
-        // draw the game over UI with alpha at zero
-        this.gameoverUI = this.add.sprite(
-            0,
-            0,
-            "gameover ui"
-            ).setOrigin(0, 0);
-        this.gameoverUI.alpha = 0;
-        this.gameoverUITween = false;
-        this.gameoverUI.setDepth(100);
-        
-        // this variable is used when u transition from game over to title screen
-        this.transRectTween = false;
-        
-        this.lowFuelText = this.add.sprite(
-            config.width/2,
-            -borderUISize,
-            "low fuel text"
-            ).setOrigin(.5, 0);
-        this.lowFuelTextShowing = false;
-        this.lowFuelTextTweening = false;
-        this.lowFuelText.tint = 0xFF0000;
-
-        this.fuelDial = this.add.sprite(
-            borderUISize/2 + 7,
-            borderUISize/2 + 7,
-            "play dial"
-            ).setOrigin(.5, 0);
-        
-        this.speedDial = this.add.sprite(
-            config.width - borderUISize/2 - 7,
-            borderUISize /2 + 7,
-            "play dial"
-            ).setOrigin(.5, 0);
-
-        // draw fuel gauge sprite
-        // in the future this will have two sprites + numbers
-        this.fuelGauge = this.add.sprite(
-            borderUISize /2,
-            borderUISize/2,
-            "fuel gauge"
-            ).setOrigin(0, 0);
-        
-        // draw speedometer sprite
-        // same thing as above
-        this.speedometer = this.add.sprite(
-            config.width - borderUISize/2,
-            borderUISize/2,
-            "speedometer"
-            ).setOrigin(1, 0);
-
-        this.fuelGaugeTextRenderer = new NumberRenderer(
-            this, 
-            this.fuelGauge.x + borderUISize,
-            this.fuelGauge.y + borderUISize/2,
-            Math.round(this.gas),
-            2
-            );
-
-        this.speedometerTextRenderer = new NumberRenderer(
-            this,
-            this.speedometer.x - borderUISize*2 + 3,
-            this.fuelGauge.y + borderUISize/2,
-            Math.round(this.speed*10),
-            2
-            );
-        // animate the gauges coming in
-        this.tweens.add({
-            targets: [this.fuelGauge, this.speedometer],
-            y: {from: 0 - this.speedometer.height, to: borderUISize/2},
-            duration: 500,
-            ease: "Back.Out"
-        });
-        this.tweens.add({
-            targets: [this.fuelGaugeTextRenderer, this.speedometerTextRenderer],
-            y: {from: 0 - this.speedometer.height + borderUISize/2, to: this.fuelGauge.y + borderUISize/2},
-            duration: 500,
-            ease: "Back.Out"
-        });
-        this.tweens.add({
-            targets: [this.fuelDial, this.speedDial],
-            y: {from: borderUISize/2 + 7 - this.speedometer.height, to: borderUISize/2 + 7},
-            duration: 500,
-            ease: "Back.Out"
-        });
-
-        this.odometer = this.add.sprite(
-            config.width/2,
-            borderUISize,
-            "odometer"
-            ).setOrigin(.5, 0);
-
-        this.distanceTextRenderer = new NumberRenderer(
-            this,
-            this.odometer.x - this.odometer.width/2 + borderUISize,
-            this.odometer.y + borderUISize/2,
-            Math.round(distance),
-            6
-            );
-
-
-        this.tweens.add({
-            targets: [this.odometer],
-            y: {from: -this.odometer.height, to: borderUISize},
-            duration: 500,
-            ease: "Back.Out"
-        });
-
-        this.tweens.add({
-            targets: [this.distanceTextRenderer],
-            y: {from: -this.odometer.height + borderUISize/2, to: this.odometer.y + borderUISize/2-2},
-            duration: 500,
-            ease: "Back.Out"
-        });
+        this.drawUI();
 
         this.input.keyboard.on("keydown-O", () => {
             this.gas += 10;
@@ -466,10 +354,29 @@ class Play extends Phaser.Scene {
             else { //game over screen
                 if (this.gameoverUITween == false && speed == 0) {
                     this.gameoverUITween = true;
+                    this.gameoverUI = this.add.sprite(
+                        0,
+                        0,
+                        "gameover ui"
+                        ).setOrigin(0, 0);
+                    this.gameoverUI.alpha = 0;
                     this.tweens.add({
                         targets: [this.gameoverUI],
                         alpha: {from: 0, to: 1},
                         duration: 1000
+                    }).on("complete", () => {
+                        for(let i = 0; i < 6; i++) {
+                            if(this.distanceTextRenderer.numberSprites[i] != undefined) {
+                                this.distanceTextRenderer.numberSprites[i].setDepth(101);
+                                console.log(this.distanceTextRenderer.numberSprites[i].depth);
+                            }
+                        }
+                        this.tweens.add({
+                            targets: [this.distanceTextRenderer],
+                            y: borderUISize *6.25,
+                            duration: 1000,
+                            ease: "Cubic.Out"
+                        });
                     });
                 }
                 if(speed != 0) {
@@ -537,5 +444,115 @@ class Play extends Phaser.Scene {
             game.config.height - 1.62 * borderUISize,
             "obstacle",
             0).setOrigin(0.5,1));
+    }
+
+    drawUI() {
+        // draw the game over UI with alpha at zero
+        
+        this.gameoverUITween = false;
+        
+        // this variable is used when u transition from game over to title screen
+        this.transRectTween = false;
+        
+        this.lowFuelText = this.add.sprite(
+            config.width/2,
+            -borderUISize,
+            "low fuel text"
+            ).setOrigin(.5, 0);
+        this.lowFuelTextShowing = false;
+        this.lowFuelTextTweening = false;
+        this.lowFuelText.tint = 0xFF0000;
+
+        this.fuelDial = this.add.sprite(
+            borderUISize/2 + 7,
+            borderUISize/2 + 7,
+            "play dial"
+            ).setOrigin(.5, 0);
+        
+        this.speedDial = this.add.sprite(
+            config.width - borderUISize/2 - 7,
+            borderUISize /2 + 7,
+            "play dial"
+            ).setOrigin(.5, 0);
+
+        // draw fuel gauge sprite
+        // in the future this will have two sprites + numbers
+        this.fuelGauge = this.add.sprite(
+            borderUISize /2,
+            borderUISize/2,
+            "fuel gauge"
+            ).setOrigin(0, 0);
+        
+        // draw speedometer sprite
+        // same thing as above
+        this.speedometer = this.add.sprite(
+            config.width - borderUISize/2,
+            borderUISize/2,
+            "speedometer"
+            ).setOrigin(1, 0);
+
+        this.fuelGaugeTextRenderer = new NumberRenderer(
+            this, 
+            this.fuelGauge.x + borderUISize,
+            this.fuelGauge.y + borderUISize/2,
+            Math.round(this.gas),
+            2
+            );
+
+        this.speedometerTextRenderer = new NumberRenderer(
+            this,
+            this.speedometer.x - borderUISize*2 + 3,
+            this.fuelGauge.y + borderUISize/2,
+            Math.round(this.speed*10),
+            2
+            );
+        // animate the gauges coming in
+        this.tweens.add({
+            targets: [this.fuelGauge, this.speedometer],
+            y: {from: 0 - this.speedometer.height, to: borderUISize/2},
+            duration: 500,
+            ease: "Back.Out"
+        });
+        this.tweens.add({
+            targets: [this.fuelGaugeTextRenderer, this.speedometerTextRenderer],
+            y: {from: 0 - this.speedometer.height + borderUISize/2, to: this.fuelGauge.y + borderUISize/2},
+            duration: 500,
+            ease: "Back.Out"
+        });
+        this.tweens.add({
+            targets: [this.fuelDial, this.speedDial],
+            y: {from: borderUISize/2 + 7 - this.speedometer.height, to: borderUISize/2 + 7},
+            duration: 500,
+            ease: "Back.Out"
+        });
+
+        this.odometer = this.add.sprite(
+            config.width/2,
+            borderUISize,
+            "odometer"
+            ).setOrigin(.5, 0);
+
+        this.distanceTextRenderer = new NumberRenderer(
+            this,
+            this.odometer.x - this.odometer.width/2 + borderUISize - 2,
+            this.odometer.y + borderUISize/2,
+            Math.round(distance),
+            6
+            );
+
+
+        this.tweens.add({
+            targets: [this.odometer],
+            y: {from: -this.odometer.height, to: borderUISize},
+            duration: 500,
+            ease: "Back.Out"
+        });
+
+        this.tweens.add({
+            targets: [this.distanceTextRenderer],
+            y: {from: -this.odometer.height + borderUISize/2, to: this.odometer.y + borderUISize/2-2},
+            duration: 500,
+            ease: "Back.Out"
+        });
     }
 }
