@@ -46,7 +46,6 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.scene.time.delayedCall(3000, () => {
                 this.tweening = 0;
             });
-            this.sc
             this.scene.tweens.add({
                 targets: [this],
                 x: {from: this.x, to: borderUISize * 2 + this.width / 2},
@@ -57,7 +56,6 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.scene.time.delayedCall(3000, () => {
                 this.tweening = 0;
             });
-            this.sc
             this.scene.tweens.add({
                 targets: [this],
                 x: {from: this.x, to: borderUISize * 3 + this.width / 2},

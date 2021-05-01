@@ -199,6 +199,15 @@ class Play extends Phaser.Scene {
                 }
             });
             this.physics.world.collide(this.engine, this.platformGroup, () => {
+                if(this.engine.body.embedded && this.engine.y <= game.config.height / 2 + borderUISize + 0.95 * borderUISize + 40) { //if clipping into platform high, snap to platform
+                    console.log("high clip");
+                    this.engine.y = game.config.height / 2 + borderUISize + 0.95 * borderUISize;
+                    this.engine.setVelocity(0,0);
+                }
+                else if(this.engine.body.embedded) { //if clipping into platform low, snap below platform
+                    console.log("low clip");
+                    this.engine.y = game.config.height / 2 + borderUISize + 0.95 * borderUISize + 95;
+                }
                 if(this.engine.airborne && this.engine.body.touching.down) { //if player has just landed on platform, land
                     this.engine.land();
                 }
