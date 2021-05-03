@@ -24,21 +24,17 @@ class Menu extends Phaser.Scene {
         this.load.audio("select", "./assets/Select.wav");
         this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
             {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
-        this.load.spritesheet("fireguy", "./assets/fire-guy-Sheet.png",
-            {frameWidth:64, frameHeight: 64, startFrame: 0, endFrame: 3});
+        this.load.atlas("fireguy", "./assets/engine_animations.png", "./assets/engine_animations.json");
     }
 
     create() {
+        this.frameNames = this.textures.get("fireguy").getFrameNames();
+        console.log(this.frameNames);
         // select sound
         this.select = this.sound.add("select");
         // i only use the first frame but i load the whole animation anyway
-        this.anims.create({
-            key: "run",
-            frames: this.anims.generateFrameNumbers("fireguy",
-                {start: 0, end: 3, first: 0}),
-            frameRate: 9,
-            repeat: -1
-        });
+        
+        this.create_animations();
 
         // this is the same color as the background in the sun image.
         // it's so that the sky extends when the sun image is below 0,0 the sky is still the right color
@@ -101,7 +97,7 @@ class Menu extends Phaser.Scene {
             config.width/2,
             config.height*1.25,
             "names"
-            ).setOrigin(.5,1);
+            ).setOrigin(.5,0);
 
         // meters
         this.meter1 = this.add.sprite(
@@ -137,22 +133,16 @@ class Menu extends Phaser.Scene {
         this.dial2Tweening = false;     // ^^
         
         // so we can put the little guy running at the bottom of the screen for the transition
-        this.anims.create({
-            key: "run",
-            frames: this.anims.generateFrameNumbers("fireguy",
-                {start: 0, end: 3, first: 0}),
-            frameRate: 9,
-            repeat: -1
-        });
+        
         
         // our baby!
         this.engine = this.add.sprite(
             borderUISize,
             config.height - 1.62 * borderUISize + this.bgOffset*10,
-            "fireguy",
+            "run half",
             0
             ).setOrigin(.5, 1);
-        //this.engine.play("run");
+        this.engine.play("run half");
 
         // okay here are all the tweens. 
         this.tweenLength = 4000;
@@ -245,7 +235,7 @@ class Menu extends Phaser.Scene {
             this.time.delayedCall(1125, () => {
                 this.tweens.add({
                     targets: [this.names],
-                    y: {from: config.height*1.25, to: config.height - borderUISize},
+                    y: {from: config.height*1.25, to: config.height - this.meter1.height + 22},
                     duration: 750,
                     ease: "Back.Out"
                 });
@@ -332,5 +322,272 @@ class Menu extends Phaser.Scene {
                     this.dial2Tweening = false;
             })});
         }
+    }
+
+    create_animations() {
+        this.anims.create({
+            key: "run full",
+            frames: [{
+                key: "fireguy",
+                frame: "run_full-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_full-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_full-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_full-3.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "run half",
+            frames: [{
+                key: "fireguy",
+                frame: "run_half-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_half-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_half-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_half-3.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "run low",
+            frames: [{
+                key: "fireguy",
+                frame: "run_low-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_low-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_low-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "run_low-3.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "death",
+            frames: [{
+                key: "fireguy",
+                frame: "death-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-3.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-4.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-5.png"
+            },
+            ],
+            frameRate: 2,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: "attack full",
+            frames: [{
+                key: "fireguy",
+                frame: "attack_full-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-3.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-4.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-5.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-6.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-7.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-8.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-9.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-10.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_full-11.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "attack half",
+            frames: [{
+                key: "fireguy",
+                frame: "attack_half-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-3.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-4.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-5.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-6.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-7.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-8.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-9.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-10.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_half-11.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "attack low",
+            frames: [{
+                key: "fireguy",
+                frame: "attack_low-0.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-3.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-4.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-5.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-6.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-7.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-8.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-9.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-10.png"
+            },
+            {
+                key: "fireguy",
+                frame: "attack_low-11.png"
+            },
+            ],
+            frameRate: 9,
+            repeat: -1
+        });
     }
 }

@@ -70,9 +70,10 @@ class Play extends Phaser.Scene {
         this.engine = this.add.sprite(
             borderUISize,
             game.config.height - 1.62 * borderUISize,
-            "fireguy",
-            0).setOrigin(0.5,1);
-        this.engine.play("run");
+            "run half",
+            0
+            ).setOrigin(.5, 1);
+        this.engine.play("run half");
         
         
 
@@ -143,12 +144,12 @@ class Play extends Phaser.Scene {
             this,
             borderUISize,
             game.config.height - 1.62 * borderUISize,
-            "fireguy",
+            "run half",
             0,
             keyF,
             keySPACE).setOrigin(0.5,1);
         
-        this.engine.anims.play("run");
+        this.engine.anims.play("run half");
 
         //create platform group
         this.platformGroup = this.add.group({
@@ -289,16 +290,32 @@ class Play extends Phaser.Scene {
                 if(this.gas > 66 && speed != hiSpeed) { //if engine has full tank, go to high speed
                     console.log("hispeed set");
                     speed = hiSpeed;
+                    if (this.engine.texture != "run full") {
+                        this.engine.texture = "run full";
+                        this.engine.play("run full");
+                    }
                 } else if(this.gas >= 33 &&  this.gas <= 66 && speed != midSpeed) { //if engine has half tank, go to medium speed
                     console.log("midspeed set");
                     speed = midSpeed;
+                    if (this.engine.texture != "run half") {
+                        this.engine.texture = "run half";
+                        this.engine.play("run half");
+                    }
                 } else if(this.gas > 0 && this.gas < 33 && speed != loSpeed) { //if engine is low, but not empty, go to low speed
                     console.log("lowspeed set");
-                    speed = loSpeed;          
+                    speed = loSpeed;  
+                    if (this.engine.texture != "run low") {
+                        this.engine.texture = "run low";
+                        this.engine.play("run low");
+                    }        
                 } else if(this.gas <= 0) {
                     //if player is out of gas, end game
                     this.gameOver = true;
                     console.log("game over");
+                    if (this.engine.texture != "death") {
+                        this.engine.texture = "death";
+                        this.engine.play("death");
+                    }
                 }
 
                 //consume gas based how long game has been going
