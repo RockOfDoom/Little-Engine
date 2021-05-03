@@ -82,7 +82,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         }
 
         if(Phaser.Input.Keyboard.JustDown(this.aKey) && !this.hurting && !this.attacking) { //attack when attack input is recieved
-            this.attack();
+            this.attack(gas);
         }
     }
 
@@ -110,29 +110,49 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         // console.log(this.airborne);
     }
 
-    attack() {
+    attack(gas) {
         this.attacking = true;
-        this.scene.tweens.add({
-            targets: [this],
-            scale: {from: 1, to: 0.5},
-            duration: 125
-        });
+        if(gas > 66){ //if gas is full, play full attack anim
+            this.texture = "attack full";
+            this.play("attack full");
+        } else if(gas >= 33 && gas <= 66) { //if gas is half, play half attack anim
+            this.texture = "attack half";
+            this.play("attack half");
+        } else if(gas > 0 && gas < 33) { //if gas is low, play low attack anim
+            this.texture = "attack low";
+            this.play("attack low");
+        }
         this.scene.time.delayedCall(125, () => {
-            if(!this.hurting) {
+            if(!this.hurting) { //if player has not been hit, follow through with attack
                 this.damaging = true;
                 this.atkSFX.play();
-                this.scene.tweens.add({
-                    targets: [this],
-                    scale: {from: 0.5, to: 1.5},
-                    duration: 125});
-            }});
+                this.body.setSize(80, 56, true);
+            } else if(gas > 66){ //if gas is full, go back to full run anim
+                this.texture = "run full";
+                this.play("run full");
+            } else if(gas >= 33 && gas <= 66) { //if gas is half, go back to half run anim
+                this.texture = "run half";
+                this.play("run half");
+            } else if(gas > 0 && gas < 33) { //if gas is low, go back to low run anim
+                this.texture = "run low";
+                this.play("run low");
+            }
+        });
         this.scene.time.delayedCall(500, () => {
-            this.scene.tweens.add({
-                targets: [this],
-                scale: {from: 1.5, to: 1},
-                duration: 75});
+            if(gas > 66){ //if gas is full, go back to full run anim
+                this.texture = "run full";
+                this.play("run full");
+            } else if(gas >= 33 && gas <= 66) { //if gas is half, go back to half run anim
+                this.texture = "run half";
+                this.play("run half");
+            } else if(gas > 0 && gas < 33) { //if gas is low, go back to low run anim
+                this.texture = "run low";
+                this.play("run low");
+            }
             this.attacking = false;
             this.damaging = false;
+            this.body.setSize(40, 56, true);
+            this.body.setOffset(1, 2.25);
         });
     }
 

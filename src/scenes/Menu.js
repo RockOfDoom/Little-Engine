@@ -476,7 +476,7 @@ class Menu extends Phaser.Scene {
                 frame: "attack_full-11.png"
             },
             ],
-            frameRate: 9,
+            frameRate: 24,
             repeat: -1
         });
 
@@ -531,7 +531,7 @@ class Menu extends Phaser.Scene {
                 frame: "attack_half-11.png"
             },
             ],
-            frameRate: 9,
+            frameRate: 24,
             repeat: -1
         });
 
@@ -586,7 +586,7 @@ class Menu extends Phaser.Scene {
                 frame: "attack_low-11.png"
             },
             ],
-            frameRate: 9,
+            frameRate: 24,
             repeat: -1
         });
     }
