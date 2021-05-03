@@ -9,6 +9,8 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         this.setGravityY(900); //give gravity
         this.anims.play("enemy1Run"); //play running animation
         this.scene = scene; //save scene for tween purposes
+        //create particle manager for enemy death particles
+        this.particles = this.scene.add.particles("spark");
         this.goingRight = false; //keeps track of which way enemy is walking
         this.ticker = 0; //internal timer
         this.walkSpeed = 2; //how fast the enemy can move
@@ -44,7 +46,16 @@ class Enemy1 extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    die() {
+    die() { //play death animation, and then destroy this enemy
+        this.emitter = this.particles.createEmitter({
+            x: this.x,
+            y: this.y - (this.height / 2),
+            speed: 400,
+            lifespan: {min: 125, max: 250}
+        });
+        this.scene.time.delayedCall(250, () => {
+            this.particles.destroy();
+        })
         this.destroy();
     }
 }

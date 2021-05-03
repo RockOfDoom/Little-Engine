@@ -89,6 +89,7 @@ class Play extends Phaser.Scene {
         this.load.image("odometer","./assets/odometer.png");
         this.load.image("obstacle","./assets/obstacle_shroom.png");
         this.load.image("mash space", "./assets/mash_space.png");
+        this.load.image("spark", "./assets/spark.png");
         this.load.spritesheet("numbers", "./assets/numbers.png", {frameWidth: 32, frameHeight: 50, start: 0, end: 9});
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
@@ -178,6 +179,9 @@ class Play extends Phaser.Scene {
         this.obstacleGroup = this.add.group({
             runChildUpdate: true
         });
+
+        //create place to hold enemy death particles so they can be moved
+        this.activeParticles = this.add.particles("spark");
         
         // this is all of the UI stuff in create i just moved them cuz create was getting p full
         this.drawUI();
@@ -200,6 +204,7 @@ class Play extends Phaser.Scene {
                 this.mushrooms.tilePositionX += speed - (speed / 8);
                 this.groundbacking.tilePositionX += speed;
                 this.ground.tilePositionX += speed;
+                this.activeParticles.x -= speed;
                 //update distance by 1 * speed per second
                 // speed is in miles per hour, so we convert that to feet per second
                 distance += (speed / 60) * 1.46667;
@@ -276,6 +281,7 @@ class Play extends Phaser.Scene {
                 this.physics.world.collide(this.engine, this.enemy1Group, (engine, enemy1) => { //check collision with enemies
                     if(this.engine.damaging) { //if the player is in their attack sweet spot, kill enemy and add to gas
                         this.gas += 10; //* this.gasGuzzle;
+                        this.activeParticles = enemy1.particles;
                         enemy1.die();
                     }
                     else if(!this.engine.hurting) { //lower speed if player runs into enemy
