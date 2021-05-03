@@ -31,7 +31,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
 
     update(gas, frame) {
         //change position on screen based on speed
-        if(speed == loSpeed && this.x != borderUISize + this.width / 2 && this.tweening != 1) {
+        if(speed == loSpeed && this.x != borderUISize + this.width / 2 && this.tweening != 1) { //move forward if player is at high speed
             this.tweening = 1;
             this.scene.time.delayedCall(3000, () => {
                 this.tweening = 0;
@@ -41,7 +41,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                 x: {from: this.x, to: borderUISize + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2 && this.tweening != 2) {
+        } else if(speed == midSpeed && this.x != borderUISize * 2 + this.width / 2 && this.tweening != 2) { //move to middle if player is at medium speed
             this.tweening = 2;
             this.scene.time.delayedCall(3000, () => {
                 this.tweening = 0;
@@ -51,7 +51,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                 x: {from: this.x, to: borderUISize * 2 + this.width / 2},
                 duration: 3000,
             });
-        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2 && this.tweening != 3) {
+        } else if(speed == hiSpeed && this.x != borderUISize * 3 + this.width / 2 && this.tweening != 3) { //move backward if player is at low speed
             this.tweening = 3;
             this.scene.time.delayedCall(3000, () => {
                 this.tweening = 0;
@@ -75,7 +75,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.setGravityY(this.jumpHeight * 3);
         }
         
-        this.fastFalling = true;
+        this.fastFalling = true; //cause player to stop rising if they have released the jump key (see jump())
         if(this.jKey.isDown) { //jump when jump input is recieved
             // console.log("jump initiated");
             this.jump();
@@ -86,31 +86,27 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    jump() {
-        if(!this.airborne) {
+    jump() { //call this to start and/or continue the player's jump
+        if(!this.airborne) { //start the jump if it has not been started
             this.jumping = true;
             this.fastFalling = false;
             this.scene.time.delayedCall(25, () => {this.jumping = false;});
             this.airborne = true;
             this.setVelocity(0, -this.jumpHeight);
             this.jumpSFX.play();
-        } else {
+        } else { //allow the player to continue rising if they are still holding the jump key
             this.fastFalling = false;
         }
-        // else if(this.jumping) {
-        //     this.addVelocity(0, -1);
-        // }
-        // console.log("jump executed");
     }
 
-    land() {
+    land() { //finish a jump / aerial manuever and reset player's ability to jump again
         this.landing = true;
         this.airborne = false;
         this.setGravityY(this.jumpHeight);
         // console.log(this.airborne);
     }
 
-    attack(gas) {
+    attack(gas) { //initiate and carry out an attacking action
         this.attacking = true;
         if(gas > 66){ //if gas is full, play full attack anim
             this.texture = "attack full";
@@ -122,7 +118,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
             this.texture = "attack low";
             this.play("attack low");
         }
-        this.scene.time.delayedCall(125, () => {
+        this.scene.time.delayedCall(125, () => { //once attack has progressed to damage stage, evaluate
             if(!this.hurting) { //if player has not been hit, follow through with attack
                 this.damaging = true;
                 this.atkSFX.play();
@@ -138,7 +134,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
                 this.play("run low");
             }
         });
-        this.scene.time.delayedCall(500, () => {
+        this.scene.time.delayedCall(500, () => { //conclude attack
             if(gas > 66){ //if gas is full, go back to full run anim
                 this.texture = "run full";
                 this.play("run full");
@@ -156,7 +152,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    getHurt() {
+    getHurt() { //partially stun player / give them feedback that they have been hurt
         this.hurting = true;
         this.hurtSFX.play();
         this.scene.time.delayedCall(1000, () => {this.hurting = false;});
