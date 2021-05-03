@@ -18,7 +18,9 @@ class Play extends Phaser.Scene {
         this.platformFreq = 300; //controls the interval between platform spawns in ticks (60 per second)
         this.enemy1Freq = 600; //controls the interval between enemy spawns in ticks
         this.obstacleFreq = 1500; //controls the interval between obstacle spawns in ticks
-        this.intensity = 0; //controls the rate at which obstacles spawn, goes up over time
+        this.startMash = false; //used to have the player mash the spacebar to start the game
+        this.mashCount = 0; //used in conjunction with startMash
+        this.mashTick = 0; //used in conjunction with mashCount
     }
 
     preload() {
@@ -179,10 +181,16 @@ class Play extends Phaser.Scene {
         this.deltaTicker += delta; //update deltaTicker with milliseconds since last update()
         while(this.deltaTicker >= 16.666666) { //only perform updates 60 times per second
             //move backgrounds based on current speed
-            this.buildings.tilePositionX += speed / 2;
-            this.mushrooms.tilePositionX += speed - (speed / 8);
-            this.groundbacking.tilePositionX += speed;
-            this.ground.tilePositionX += speed;
+            if(this.startMash) {
+                this.buildings.tilePositionX += speed / 2;
+                this.mushrooms.tilePositionX += speed - (speed / 8);
+                this.groundbacking.tilePositionX += speed;
+                this.ground.tilePositionX += speed;
+                //update distance by 1 * speed per second
+                // speed is in miles per hour, so we convert that to feet per second
+                distance += (speed / 60) * 1.46667;
+                //console.log(distance);
+            }
             // console.log("speed: " + speed);
 
             // animate the dials
@@ -217,13 +225,25 @@ class Play extends Phaser.Scene {
             this.physics.world.collide(this.enemy1Group, this.groundBox);
             this.physics.world.collide(this.enemy1Group, this.platformGroup);
 
-            //update distance by 1 * speed per second
-            // speed is in miles per hour, so we convert that to feet per second
-            distance += (speed / 60) * 1.46667;
-            //console.log(distance);
+            //if game has not started, let player mash space to start game
+            if(!this.startMash) {
+                if(Phaser.Input.Keyboard.JustDown(keySPACE)) { //if space is hit, add to the mash tracker and reset the tick tracker
+                    this.mashCount++;
+                    this.mashTick = 0;
+                }
+                else { //otherwise, add to the tick tracker
+                    this.mashTick++;
+                }
 
-            //update game pieces if game is not over
-            if(!this.gameOver) {
+                if(this.mashCount >= 5) { //if space has been mashed enough times, start game
+                    this.startMash = true;
+                }
+                else if(this.mashTick >= 30) { //if half a second has passed without a spacepress, reset mashCount and mashTick
+                    this.mashCount = 0;
+                    this.mashTick = 0;
+                }
+            } //update game pieces if game is not over
+            else if(!this.gameOver && this.startMash) {
                 //increase speed every 10s
                 if(this.frameTick != 0 && this.frameTick % 600 == 0) {
                     hiSpeed += 0.5;
