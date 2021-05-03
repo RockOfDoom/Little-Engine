@@ -30,7 +30,7 @@ class Platform extends Phaser.Physics.Arcade.Sprite {
             this.scene.fuelGroup.add(new Fuel(
                 this.scene, 
                 this.x, 
-                this.y, 
+                this.y-6, 
                 "fuel", 
                 0).setOrigin(0.5,0));
         }

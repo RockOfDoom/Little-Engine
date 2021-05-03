@@ -252,7 +252,7 @@ class Menu extends Phaser.Scene {
                 duration: 2000
             });
             this.menuSprite.y = 0;
-            this.names.y = config.height - borderUISize;
+            this.names.y = config.height - this.meter1.height + 22;
             
         } 
         // i dont remember why this is here but i do know that it has to be here 💖💖
@@ -419,6 +419,37 @@ class Menu extends Phaser.Scene {
             {
                 key: "fireguy",
                 frame: "death-5.png"
+            },
+            ],
+            frameRate: 2,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: "wake up",
+            frames: [{
+                key: "fireguy",
+                frame: "death-5.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-4.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-3.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-2.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-1.png"
+            },
+            {
+                key: "fireguy",
+                frame: "death-0.png"
             },
             ],
             frameRate: 2,
