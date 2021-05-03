@@ -32,7 +32,7 @@ class Platform extends Phaser.Physics.Arcade.Sprite {
                 this.x, 
                 this.y, 
                 "fuel", 
-                0).setOrigin(0.5,0));
+                0).setOrigin(0.5,0.5));
         }
         else if(Math.random() >= 0.5) { //if no fuel, 50/50 shot of enemy spawn
             this.scene.spawnEnemy1(this.x + this.width / 4, this.y + 0.95 * borderUISize);
