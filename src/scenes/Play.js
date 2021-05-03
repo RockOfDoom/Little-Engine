@@ -310,21 +310,21 @@ class Play extends Phaser.Scene {
                 if(this.gas > 66 && speed != hiSpeed) { //if engine has full tank, go to high speed
                     console.log("hispeed set");
                     speed = hiSpeed;
-                    if (this.engine.texture != "run full") {
+                    if (this.engine.texture != "run full" && !this.engine.attacking) {
                         this.engine.texture = "run full";
                         this.engine.play("run full");
                     }
                 } else if(this.gas >= 33 &&  this.gas <= 66 && speed != midSpeed) { //if engine has half tank, go to medium speed
                     console.log("midspeed set");
                     speed = midSpeed;
-                    if (this.engine.texture != "run half") {
+                    if (this.engine.texture != "run half" && !this.engine.attacking) {
                         this.engine.texture = "run half";
                         this.engine.play("run half");
                     }
                 } else if(this.gas > 0 && this.gas < 33 && speed != loSpeed) { //if engine is low, but not empty, go to low speed
                     console.log("lowspeed set");
                     speed = loSpeed;  
-                    if (this.engine.texture != "run low") {
+                    if (this.engine.texture != "run low" && !this.engine.attacking) {
                         this.engine.texture = "run low";
                         this.engine.play("run low");
                     }        
