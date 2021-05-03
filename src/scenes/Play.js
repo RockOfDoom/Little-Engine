@@ -72,10 +72,9 @@ class Play extends Phaser.Scene {
         this.engine = this.add.sprite(
             borderUISize,
             game.config.height - 1.62 * borderUISize,
-            "run half",
+            "asleep",
             0
             ).setOrigin(.5, 1);
-        this.engine.play("run half");
         
         
 
@@ -88,15 +87,17 @@ class Play extends Phaser.Scene {
         this.load.image("play dial", "./assets/play_dial.png");
         this.load.image("low fuel text", "./assets/low_fuel_text.png");
         this.load.image("odometer","./assets/odometer.png");
-        this.load.spritesheet("numbers", "./assets/numbers.png", {frameWidth: 32, frameHeight: 50, start: 0, end: 9});
         this.load.image("obstacle","./assets/obstacle_shroom.png");
+        this.load.image("mash space", "./assets/mash_space.png");
+        this.load.spritesheet("numbers", "./assets/numbers.png", {frameWidth: 32, frameHeight: 50, start: 0, end: 9});
         this.load.audio("jumpSFX", "./assets/Jump2.wav");
         this.load.audio("atkSFX", "./assets/Fireball.wav");
         this.load.audio("hurtSFX", "./assets/Hit-matrixxx.wav");
         this.load.audio("music", "./assets/BackgroundMusic_mixdown4.wav");
         this.load.audio("engineRev", "./assets/EngineRevvingEscortmarius.wav");
-        this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
-            {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
+        this.load.audio("low fuel audio", "./assets/BeepSamsterbirdies.wav");
+        // this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
+        //     {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
         
     }
 
@@ -104,7 +105,10 @@ class Play extends Phaser.Scene {
         this.music = this.sound.add("music", {
             loop: true
         });
-        this.music.play();
+        
+
+        this.beep = this.sound.add("low fuel audio");
+        this.beepPlayed = false;
         
         this.rev = this.sound.add("engineRev");
         this.rev.play();
@@ -146,12 +150,21 @@ class Play extends Phaser.Scene {
             this,
             borderUISize,
             game.config.height - 1.62 * borderUISize,
-            "run half",
+            "wake up",
             0,
             keyF,
             keySPACE).setOrigin(0.5,1);
         
-        this.engine.anims.play("run half");
+        this.engine.anims.play("wake up").on("animationcomplete", () => {
+            this.time.delayedCall(125, () => {
+                this.tweens.add({
+                    targets: [this.mashSpaceText],
+                    x: borderUISize/2-10,
+                    duration: 750,
+                    ease: "Bounce.Out"
+                });
+            });
+        });
 
         //create platform group
         this.platformGroup = this.add.group({
@@ -230,14 +243,19 @@ class Play extends Phaser.Scene {
             if(!this.startMash) {
                 if(Phaser.Input.Keyboard.JustDown(keySPACE)) { //if space is hit, add to the mash tracker and reset the tick tracker
                     this.mashCount++;
+                    this.mashSpaceText.setTintFill(0xFFFFFF);
                     this.mashTick = 0;
                 }
                 else { //otherwise, add to the tick tracker
                     this.mashTick++;
+                    this.mashSpaceText.clearTint();
                 }
 
                 if(this.mashCount >= 5) { //if space has been mashed enough times, start game
                     this.startMash = true;
+                    this.engine.texture = "run half";
+                    this.engine.play("run half");
+                    this.music.play();
                 }
                 else if(this.mashTick >= 30) { //if half a second has passed without a spacepress, reset mashCount and mashTick
                     this.mashCount = 0;
@@ -286,7 +304,8 @@ class Play extends Phaser.Scene {
                         }
                         midSpeed -= 1;
                         if(midSpeed < 2) {
-                            midSpeed = 2;                        }
+                            midSpeed = 2;                        
+                        }
                         loSpeed -= 1;
                         if(loSpeed < 1) {
                             loSpeed = 1;
@@ -380,6 +399,10 @@ class Play extends Phaser.Scene {
                 if (this.gas <= 33) {
                     if (this.lowFuelTextTweening == false) {
                         this.lowFuelTextTweening = true;
+                        if (this.beepPlayed == false) {
+                            this.beep.play();
+                            this.beepPlayed = true;
+                        }
                         this.tweens.add({
                             targets: [this.lowFuelText],
                             y: borderUISize * 4,
@@ -394,6 +417,7 @@ class Play extends Phaser.Scene {
                 if (this.lowFuelTextShowing && this.gas > 33) {
                     if (this.lowFuelTextTweening == false) {
                         this.lowFuelTextTweening = true;
+                        this.beepPlayed = false;
                         this.tweens.add({
                             targets: [this.lowFuelText],
                             y: -borderUISize,
@@ -405,6 +429,7 @@ class Play extends Phaser.Scene {
                         });
                     }
                 }
+                this.mashSpaceText.x -= speed;
             }
             else { 
                 //game over screen
@@ -533,7 +558,7 @@ class Play extends Phaser.Scene {
             ).setOrigin(.5, 0);
         this.lowFuelTextShowing = false;    // it's always there but by default is just offscreen
         this.lowFuelTextTweening = false;   // cuz there are two tweens so i dont want them happening at the same time
-        this.lowFuelText.tint = 0xFF0000;   // i was gonna make them flash but then i couldn't figure it out cuz i wrote bad code
+        this.lowFuelText.tint = 0xfc5d17;   // i was gonna make them flash but then i couldn't figure it out cuz i wrote bad code
                                             // also the image is white so i make it red
         
         // this is part one of three of the fuel dial
@@ -640,5 +665,11 @@ class Play extends Phaser.Scene {
             duration: 500,
             ease: "Back.Out"
         });
+
+        this.mashSpaceText = this.add.sprite(
+            -200,
+            config.height*.75,
+            "mash space"
+            ).setOrigin(0, 0);
     }
 }

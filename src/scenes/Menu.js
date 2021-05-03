@@ -21,6 +21,7 @@ class Menu extends Phaser.Scene {
         this.load.image("tutorial label", "./assets/tutorial_label.png");
         this.load.image("tutorial1", "./assets/tutorial1.png");
         this.load.image("tutorial2", "./assets/tutorial2.png");
+        this.load.image("asleep", "./assets/asleep.png");
         this.load.audio("select", "./assets/Select.wav");
         this.load.spritesheet("enemy1", "./assets/enemy1-Sheet.png",
             {frameWidth: 64, frameHeight: 64, startFrame: 0, endFrame: 8});
@@ -28,8 +29,8 @@ class Menu extends Phaser.Scene {
     }
 
     create() {
-        this.frameNames = this.textures.get("fireguy").getFrameNames();
-        console.log(this.frameNames);
+        //this.frameNames = this.textures.get("fireguy").getFrameNames();
+
         // select sound
         this.select = this.sound.add("select");
         // i only use the first frame but i load the whole animation anyway
@@ -139,10 +140,9 @@ class Menu extends Phaser.Scene {
         this.engine = this.add.sprite(
             borderUISize,
             config.height - 1.62 * borderUISize + this.bgOffset*10,
-            "run half",
+            "asleep",
             0
             ).setOrigin(.5, 1);
-        this.engine.play("run half");
 
         // okay here are all the tweens. 
         this.tweenLength = 4000;

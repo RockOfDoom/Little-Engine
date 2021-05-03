@@ -63,11 +63,11 @@ class Tutorial extends Phaser.Scene {
         this.engine = this.add.sprite(
             this.tutorial1.x + this.tutorial1.width/2 + 18, // middle of the tutorial panel on bottom
             borderUISize*8.5 + 10,                          // spaced just right 😉
-            "run"
+            "run half"
             ).setOrigin(.5, 1);
         this.engine.scaleX = 2;                             // so it shows up better
         this.engine.scaleY =2;
-        this.engine.play("run");
+        this.engine.play("run half");
         
         // make the animation for the enemy when i put it on the tutorial
         this.anims.create({

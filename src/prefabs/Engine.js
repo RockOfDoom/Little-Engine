@@ -27,6 +27,7 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
         this.hurting = false;
         this.tweening = 0;
         this.fastFalling = true;
+        this.blinkColor = 0xFFFFFF;
     }
 
     update(gas, frame) {
@@ -153,8 +154,19 @@ class Engine extends Phaser.Physics.Arcade.Sprite {
     }
 
     getHurt() { //partially stun player / give them feedback that they have been hurt
+        this.scene.cameras.main.shake(250, .008);
         this.hurting = true;
         this.hurtSFX.play();
         this.scene.time.delayedCall(1000, () => {this.hurting = false;});
+        this.scene.time.delayedCall(100, () => this.setTintFill(this.blinkColor));
+        this.scene.time.delayedCall(300, () => this.setTintFill(this.blinkColor));
+        this.scene.time.delayedCall(500, () => this.setTintFill(this.blinkColor));
+        this.scene.time.delayedCall(700, () => this.setTintFill(this.blinkColor));
+        this.scene.time.delayedCall(900, () => this.setTintFill(this.blinkColor));
+        this.scene.time.delayedCall(200, () => this.clearTint());
+        this.scene.time.delayedCall(400, () => this.clearTint());
+        this.scene.time.delayedCall(600, () => this.clearTint());
+        this.scene.time.delayedCall(800, () => this.clearTint());
+        this.scene.time.delayedCall(1000, () => this.clearTint());
     }
 }

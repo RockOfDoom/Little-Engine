@@ -9,7 +9,7 @@
 // Fredoka One
 // Berlin Sans FB
 //
-// Twemoji: https://creativecommons.org/licenses/by/4.0/
+// Twemoji (recolored) https://creativecommons.org/licenses/by/4.0/
 // 
 // Creative Tilt:
 // Alexa is proud of the audio design and music that she did. This was the first time she worked with audio, and she learned a lot.
@@ -18,9 +18,9 @@
 // Alex is proud of the jump that he made and the series of logical statements that make it feel good to use, 
 //      (found in Engine.js between the jump() method and the update() method)
 // Star animated the player character in three distinct states. The outcome was very effective, and the character is very cute!
-// We made a really interesting and unique looking setting that works cohesively. 
+// We made a really interesting and unique looking setting that is still cohesive. 
 // The fuel system that we made adds a layer of resource management to the endless runner genre. 
-//      In the game, you are always running out of fuel, which is a unique dynamic to our game.
+//      In the game, you are always running out of fuel, which is a unique feeling to our game.
 
 let config = {
     type: Phaser.AUTO,
