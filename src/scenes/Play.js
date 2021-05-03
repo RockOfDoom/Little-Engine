@@ -111,7 +111,7 @@ class Play extends Phaser.Scene {
         this.beepPlayed = false;
         
         this.rev = this.sound.add("engineRev");
-        this.rev.play();
+        
 
         this.engine.destroy(); // this isn't the real engine it's a sprite called engine that is made in the loading screen
 
@@ -256,6 +256,7 @@ class Play extends Phaser.Scene {
                     this.engine.texture = "run half";
                     this.engine.play("run half");
                     this.music.play();
+                    this.rev.play();
                 }
                 else if(this.mashTick >= 30) { //if half a second has passed without a spacepress, reset mashCount and mashTick
                     this.mashCount = 0;
@@ -433,6 +434,7 @@ class Play extends Phaser.Scene {
             }
             else { 
                 //game over screen
+                this.mashSpaceText.alpha = 0;
                 if (this.gameoverUITween == false && speed == 0) { 
                     this.gameoverUITween = true;
                     // adds the game over UI sprite
@@ -478,6 +480,7 @@ class Play extends Phaser.Scene {
                     // this stuff is for the controls after the game over sprite is loaded on and everything
                     if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
                         // this just restarts the scene. easy. no tweening or transitioning nessicary
+                        this.music.stop();
                         this.scene.start("playScene");
                     } else if (Phaser.Input.Keyboard.JustDown(keyF) && this.transRectTween == false) {
                         this.transRectTween = true; // so i only tween it once
@@ -497,6 +500,7 @@ class Play extends Phaser.Scene {
                         }).on("complete", () => {
                             lastScene = "play";
                             // and start the next scene
+                            this.music.stop();
                             this.scene.start("menuScene");
                         });
                         
